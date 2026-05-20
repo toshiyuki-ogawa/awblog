@@ -1,0 +1,20 @@
+{
+  "name": "awblog-base",
+  "version": "0.0.1",
+  "description": "basic module",
+  "license": "Apache-2.0",
+  "author": "Toshiyuki Ogawa",
+  "type": "module",
+  "exports": {
+    "import" : "./dist/index.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "tsc-check": "tsc --noEmit",
+    "tsc-dist": "tsc --outDir dist --rootDir ./src",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

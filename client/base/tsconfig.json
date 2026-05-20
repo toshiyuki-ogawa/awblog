@@ -1,0 +1,10 @@
+{
+  "compilerOptions" : {
+    "module" : "esnext",
+    "lib": [ "esnext", "dom" ],
+    "rewriteRelativeImportExtensions": true
+  },
+  "includes" : [
+    "src/**/*"
+  ]
+}
