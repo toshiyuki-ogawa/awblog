@@ -16,6 +16,9 @@ local-dir:
 
 .PHONY: local-dir
 
+assets-dir:
+	mkdir -p docroot/assets
+
 local-python-dir: | local-dir
 	rm -f -r docroot/local/python
 	mkdir -p docroot/local/python
@@ -71,9 +74,46 @@ clean-pycache:
 .PHONY: clean-pycache
 
 
+deploy-ui: client-ui-dist docroot-basename-txt | assets-dir
+	rm -f docroot/assets/*.js*
+	rm -f docroot/assets/*.css*
+	cp client/ui/dist/*.css* docroot/assets
+	cp client/ui/dist/*.js* docroot/assets
+	cp client/ui/index.css docroot
+	cp client/ui/index.html docroot
+
+.PHONY: deploy-ui
+
+
+
+docroot-basename-txt: 
+	echo "/" > docroot/basename.txt
+
+
+.PHONY: docroot-basename-txt
+
+
 client-base-dist:
 	$(MAKE) -C client base-dist	
 
 .PHONY: client-base-dist
+
+
+client-ui-dist:
+	$(MAKE) -C client ui-dist	
+
+.PHONY: client-ui-dist
+
+
+client-base-lint:
+	$(MAKE) -C client base-lint
+
+.PHONY: client-base-lint
+
+
+client-ui-lint:
+	$(MAKE) -C client ui-lint
+
+.PHONY: client-ui-lint
 
 # vi: se ts=4 sw=4 noet:

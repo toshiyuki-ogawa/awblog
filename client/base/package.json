@@ -6,12 +6,13 @@
   "author": "Toshiyuki Ogawa",
   "type": "module",
   "exports": {
+    "types": "./dist/index.d.ts",
     "import" : "./dist/index.js"
   },
-  "main": "index.js",
   "scripts": {
     "tsc-check": "tsc --noEmit",
-    "tsc-dist": "tsc --outDir dist --rootDir ./src",
+    "tsc-dist": "tsc --declaration --outDir dist --rootDir ./src",
+    "tsc-decl": "tsc --declaration --emitDeclarationOnly --outDir dist --rootDir ./src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

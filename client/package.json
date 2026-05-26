@@ -11,10 +11,18 @@
   "author": "Toshiyuki Ogawa",
   "type": "module",
   "main": "index.js",
+  "@parcel/resolver-default": {
+    "packageExports": true
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "workspaces": [
-    "base"
-  ]
+    "base",
+    "ui"
+  ],
+  "devDependencies": {
+    "parcel": "^2.16.4",
+    "typescript": "^6.0.3"
+  }
 }
