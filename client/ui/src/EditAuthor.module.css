@@ -1,0 +1,17 @@
+.controlItem {
+  display: block;
+}
+
+input[type="number"].controlItem  {
+  width: 60px;
+}
+
+
+.controlContainer {
+  display: block flex;
+  column-gap: 0.5em;
+}
+
+
+
+/* vi: se ts=2 sw=2 et: */

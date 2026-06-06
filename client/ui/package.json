@@ -21,8 +21,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@types/google.accounts": "^0.0.18",
     "@types/react": "^19.2.15",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "ace-builds": "^1.44.0",
+    "react-markdown": "^10.1.0"
   },
   "dependencies": {
     "react": "^19.2.6",

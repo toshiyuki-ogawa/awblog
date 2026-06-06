@@ -1,0 +1,13 @@
+.disclosure {
+  transition: all 0.5s;
+}
+
+.close {
+  d: path("M 50,50 l 0,45 l 45,-45 l -45,-45 z");
+}
+
+.open {
+  d: path("M 5,50 l 45,45 l 45,-45 l -45,0 z");
+}
+ 
+/* vi: se ts=2 sw=2 et: */

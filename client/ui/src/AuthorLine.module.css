@@ -1,0 +1,22 @@
+
+.accordion {
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.accClose {
+  max-height: 0;
+}
+
+
+.controlTitle > *:first-child {
+  margin-right: 1px;
+}
+
+.controlTitle > *:last-child {
+  margin-left: 1px;
+}
+
+
+
+/* vi: se ts=2 sw=2 et: */

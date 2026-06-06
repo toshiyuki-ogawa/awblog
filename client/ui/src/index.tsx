@@ -3,6 +3,8 @@ import { BrowserRouter } from 'react-router'
 import AppRoutes from './AppRoutes'
 import { init as initAwblog }  from 'awblog-base'
 import { loadI18nSetting } from './i18n'
+import loadDataFromStorage from './storage'
+import { init as initAccount } from './account'
 
 // start application
 (async () => {
@@ -25,8 +27,9 @@ import { loadI18nSetting } from './i18n'
 
   const basename = await getBasename()
   const succeeded = await loadI18nSetting(basename)
-
   await initAwblog()
+  loadDataFromStorage()
+  initAccount()
   createRoot(document.getElementById('main')!).render(
     <BrowserRouter basename={basename} >
       <AppRoutes />

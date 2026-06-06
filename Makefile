@@ -74,7 +74,9 @@ clean-pycache:
 .PHONY: clean-pycache
 
 
-deploy-ui: client-ui-dist docroot-basename-txt | assets-dir
+deploy-ui: client-ui-dist \
+	docroot-basename-txt \
+	docroot-google-client-id-txt | assets-dir
 	rm -f docroot/assets/*.js*
 	rm -f docroot/assets/*.css*
 	cp client/ui/dist/*.css* docroot/assets
@@ -89,9 +91,15 @@ deploy-ui: client-ui-dist docroot-basename-txt | assets-dir
 docroot-basename-txt: 
 	echo "/" > docroot/basename.txt
 
-
 .PHONY: docroot-basename-txt
 
+docroot/google-client-id.txt: conf/google-client-setting.json
+	cat $< | jq -r '.web.client_id' >$@
+
+
+docroot-google-client-id-txt: docroot/google-client-id.txt
+
+.PHONY: docroot-google-client-id-txt
 
 client-base-dist:
 	$(MAKE) -C client base-dist	
