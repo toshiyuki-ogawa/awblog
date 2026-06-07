@@ -7,8 +7,8 @@ import * as ace from 'ace-builds'
 import { getContent, updateContentWithStr } from 'awblog-base'
 import { editor as editorClass } from './ContentEdit.module.css'
 import ContentEditToolbar from './ContentEditToolbar'
-import AuthorLine from './AuthorLine'
-
+import AccountLine from './AccountLine'
+import EditAuthorLine from './EditAuthorLine'
 
 /**
  * editor container object
@@ -145,7 +145,8 @@ export default function ContentEdit(props: ContentEditProperties) {
   return (
     <>
       <ContentEditToolbar saveAction={saveContent} />
-      <AuthorLine />
+      <AccountLine />
+      <EditAuthorLine />
       <Suspense fallback={<p>loading...</p>}>
         <Editor 
           onEditorAttached={onEditorAttached}

@@ -75,7 +75,7 @@ export default function EditAuthorPage(
         <button name="save" value="true">
           {getDomainText('awblog', 'Update')}
         </button>
-        <button name="save" value="false">
+        <button type="button">
           {getDomainText('awblog', 'Cancel')}
         </button>
       </div>

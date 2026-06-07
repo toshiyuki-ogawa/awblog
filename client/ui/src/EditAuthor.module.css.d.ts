@@ -1,4 +1,6 @@
 
+export const authorForm: string
+
 export const controlItem: string
 
 export const controlContainer: string

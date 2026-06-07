@@ -2,8 +2,8 @@
   display: block;
 }
 
-input[type="number"].controlItem  {
-  width: 60px;
+form.authorForm input {
+  width: 240px;
 }
 
 

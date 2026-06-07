@@ -8,6 +8,9 @@
   max-height: 0;
 }
 
+.controlTitle {
+  cursor: pointer;
+}
 
 .controlTitle > *:first-child {
   margin-right: 1px;

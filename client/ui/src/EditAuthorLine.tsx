@@ -5,29 +5,36 @@ import {
   useEffect,
   useEffectEvent } from 'react'
 import TriangleSvgIcon from './TriangleSvgIcon'
-import { EditAuthorSingleLine } from './EditAuthor'
+import { EditAuthorList } from './EditAuthor'
 import { getDomainText } from './i18n'
 import { subscribe, getOauthToken} from './account'
 import {
   accordion as accordionClass,
   authorClose as authorCloseClass,
   controlTitle as controlTitleClass
-} from './AuthorLine.module.css'
+} from './EditAuthorLine.module.css'
 
 
 /**
  * author line properties
  */
-type AuthorLineProperties = {
-  [key: string]: any
+type EditAuthorLineProperties = {
+  /**
+   * open accordion
+   */
+  open?: boolean
 }
 
 /**
  * author line
  */
-export default function AuthorLine(props: AuthorLineProperties) {
+export default function EditAuthorLine(props: EditAuthorLineProperties) {
   const [ accordionClasses, setAccordionClasses ] = useState(
-    new Set([accordionClass]))
+    new Set(
+      props.open
+        ? [accordionClass]
+        : [accordionClass, authorCloseClass]))
+ 
   useSyncExternalStore(subscribe, getOauthToken) 
 
   const [ editAuthorCntMaxHeight, setEditAuthorCntMaxHeight ] = 
@@ -90,7 +97,7 @@ export default function AuthorLine(props: AuthorLineProperties) {
         className={[...accordionClasses].join(' ')}
         style={getEditAuthorCntStyle()}
         ref={editAuthorCntRef} >
-        <EditAuthorSingleLine />  
+        <EditAuthorList />  
       </div>
     </>
   )

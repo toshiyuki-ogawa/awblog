@@ -4,10 +4,13 @@
   transition: max-height 0.5s ease-out;
 }
 
-.authorClose {
+.accClose {
   max-height: 0;
 }
 
+.controlTitle {
+  cursor: pointer;
+}
 
 .controlTitle > *:first-child {
   margin-right: 1px;
