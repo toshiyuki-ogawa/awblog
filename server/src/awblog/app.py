@@ -353,7 +353,9 @@ class App:
                         [])
             else:
                 self.response_access_denied(start_response, 'No content id') 
-
+        else:
+            self.response_access_denied(start_response, \
+                'Not allow to update header')
         return [] 
     def get_content(self, environ, start_response, params: dict):
         """ get content """

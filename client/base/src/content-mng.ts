@@ -17,23 +17,25 @@ function isOkResponse(headers: Headers): boolean {
 /**
  * create content
  */
-export async function createContent(bearer?: string):
+export async function createContent(accessToken?: string):
   Promise<number | undefined> {
 
   let result
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'create-content')
     const requestUrl = `${requestPath}?${searchParams}`
-    const res = await fetch(requestUrl, {
-      method: 'POST',
-      headers
-    })
+
+    const fetchOptions : RequestInit = {
+      headers,
+      method: 'POST'
+    }
+    const res = await fetch(requestUrl, fetchOptions)
     if (res.ok) {
       if (isOkResponse(res.headers)) {
         const jsonObj = await res.json()
@@ -50,26 +52,25 @@ export async function createContent(bearer?: string):
 export async function updateContentWithStr(
   contentId: number,
   content: string,
-  bearer?: string): Promise<boolean> {
+  accessToken?: string): Promise<boolean> {
   let result = false
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
     headers.append('Content-Type', 'application/x-www-form-urlencoded')
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'update-content')
     searchParams.append('content-id', contentId.toString())
 
-    const bodyParams = new URLSearchParams()
-    bodyParams.append('content', content)
-    const body = bodyParams.toString()
+    const body = new URLSearchParams()
+    body.append('content', content)
     const res = await fetch(`${requestPath}?${searchParams}`, {
       method: 'POST',
-      body,
-      headers
+      headers,
+      body
     })
     if (res.ok) {
       result = isOkResponse(res.headers)
@@ -84,13 +85,13 @@ export async function updateContentWithStr(
 export async function updateContentWithBlob(
   contentId: number,
   content: Blob,
-  bearer?: string): Promise<boolean> {
+  accessToken?: string): Promise<boolean> {
   let result = false
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'update-content')
@@ -100,8 +101,8 @@ export async function updateContentWithBlob(
     body.append('content', content)
     const res = await fetch(`${requestPath}?${searchParams}`, {
       method: 'POST',
-      body,
-      headers
+      headers,
+      body
     })
     if (res.ok) {
       result = isOkResponse(res.headers)
@@ -116,25 +117,33 @@ export async function updateContentWithBlob(
 export async function getContent(
   contentId: number,
   edit?: boolean,
-  bearer?: string): Promise<any> {
+  accessToken?: string): Promise<any> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
-
+ 
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'get-content')
     searchParams.append('content-id', contentId.toString())
     if (edit) {
       searchParams.append('edit', edit.toString())
     }
-    const res = await fetch(`${requestPath}?${searchParams}`, {
+
+    const fetchOptions : RequestInit = {
       method: 'GET',
       headers
-    })
+    }
+    if (accessToken) {
+      const body = new URLSearchParams()
+      body.append('access-token', accessToken)
+      fetchOptions.body = body
+    }
+
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
     if (res.ok && isOkResponse(res.headers)) {
       result = res
     }
@@ -148,18 +157,21 @@ export async function getContent(
 export async function updateContentHeader(
   contentId: number,
   contentHeader: { [key: string]: any },
-  bearer?: string): Promise<boolean> {
+  accessToken?: string): Promise<boolean> {
   let result = false
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
-    }
     headers.append('Content-Type', 'application/json')
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
+    }
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'update-header')
     searchParams.append('content-id', contentId.toString())
+    if (accessToken) {
+      searchParams.append('access-token', accessToken)
+    }
 
     const body = JSON.stringify(contentHeader)
     const res = await fetch(`${requestPath}?${searchParams}`, {
@@ -180,25 +192,33 @@ export async function updateContentHeader(
 export async function getContentHeader(
   contentId: number,
   edit?: boolean,
-  bearer?: string): Promise<any> {
+  accessToken?: string): Promise<any> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
-
+ 
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'get-header')
     searchParams.append('content-id', contentId.toString())
     if (edit) {
       searchParams.append('edit', edit.toString())
     }
-    const res = await fetch(`${requestPath}?${searchParams}`, {
+
+    const fetchOptions : RequestInit = {
       method: 'GET',
       headers
-    })
+    }
+    if (accessToken) {
+      const body = new URLSearchParams()
+      body.append('access-token', accessToken)
+      fetchOptions.body = body
+    }
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
+    
     if (res.ok && isOkResponse(res.headers)) {
       result = res
     }
@@ -214,15 +234,15 @@ export async function commit(
   author: string,
   email: string,
   deleteEditing?: boolean,
-  bearer?: string): Promise<any> {
+  accessToken?: string): Promise<any> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
-
+ 
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'commit')
     searchParams.append('content-id', contentId.toString())
@@ -231,10 +251,11 @@ export async function commit(
     if (deleteEditing) {
       searchParams.append('delete', true.toString())
     }
-    const res = await fetch(`${requestPath}?${searchParams}`, {
+    const fetchOptions: RequestInit = {
       method: 'GET',
       headers
-    })
+    }
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
     if (res.ok && isOkResponse(res.headers)) {
       result = res
     }
@@ -247,22 +268,23 @@ export async function commit(
  */
 export async function getHistoryOids(
   contentId: number,
-  bearer?: string): Promise<any> {
+  accessToken?: string): Promise<any> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
-
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'get-history')
     searchParams.append('content-id', contentId.toString())
-    const res = await fetch(`${requestPath}?${searchParams}`, {
-      method: 'GET',
+    const fetchOptions: RequestInit = {
+      method: 'POST',
       headers
-    })
+    }
+
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions) 
     if (res.ok && isOkResponse(res.headers)) {
       result = res
     }
@@ -274,21 +296,21 @@ export async function getHistoryOids(
  * list commited items
  */
 export async function listCommit(
-  bearer?: string): Promise<any> {
+  accessToken?: string): Promise<any> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
-
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'list-commit')
-    const res = await fetch(`${requestPath}?${searchParams}`, {
+    const fetchOptions: RequestInit = {
       method: 'GET',
       headers
-    })
+    }
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
     if (res.ok && isOkResponse(res.headers)) {
       result = res
     }
@@ -301,31 +323,27 @@ export async function listCommit(
  */
 export async function isEditing(
   contentId: number,
-  bearer?: string): Promise<any> {
+  accessToken?: string): Promise<any> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
-    if (bearer) {
-      headers.append('Bearer', bearer)
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
     }
-
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'is-editing')
     searchParams.append('content-id', contentId.toString())
-    const res = await fetch(`${requestPath}?${searchParams}`, {
+    const fetchOptions: RequestInit = {
       method: 'GET',
       headers
-    })
+    }
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
     if (res.ok && isOkResponse(res.headers)) {
       result = res
     }
   }
   return result
 }
-
-
-
-
 
 // vi: se ts=2 sw=2 et:

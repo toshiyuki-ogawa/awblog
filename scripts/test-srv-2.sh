@@ -4,10 +4,10 @@ declare docroot=`realpath ./docroot`
 
 declare python_paths=$docroot/local/python
 declare dtrack_config=$docroot/local/conf/dtrack.toml
+declare acc_ctrl_config=$docroot/local/conf/acc-ctrl.toml
 
 
-
-PYTHONPATH=$python_paths DOCUMENT_ROOT=$docroot DTRACK_CONFIG=$dtrack_config python3 $script_dir/test-srv.py -d docroot
+PYTHONPATH=$python_paths DOCUMENT_ROOT=$docroot DTRACK_CONFIG=$dtrack_config ACC_CTRL_CONFIG=$acc_ctrl_config python3 $script_dir/test-srv.py -d docroot
  
 
 # vi: se ts=2 sw=2 et:

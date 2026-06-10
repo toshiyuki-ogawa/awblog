@@ -4,11 +4,17 @@ import {
 } from 'react'
 
 import * as ace from 'ace-builds'
-import { getContent, updateContentWithStr } from 'awblog-base'
+import { 
+  getContent,
+  updateContentWithStr,
+  commit
+} from 'awblog-base'
 import { editor as editorClass } from './ContentEdit.module.css'
 import ContentEditToolbar from './ContentEditToolbar'
 import AccountLine from './AccountLine'
 import EditAuthorLine from './EditAuthorLine'
+import { getOauthToken } from './account'
+import { getAuthor } from './author'
 
 /**
  * editor container object
@@ -125,11 +131,15 @@ export default function ContentEdit(props: ContentEditProperties) {
    */
   function saveContent() {
     if (editor.current) {
-      const content = editor.current.getValue();
-      (async () => {
-        await updateContentWithStr(
-          props.contentId, content)
-      })() 
+      const token = getOauthToken()
+      if (token) {
+        const content = editor.current.getValue();
+
+        (async () => {
+          await updateContentWithStr(
+            props.contentId, content, token)
+        })() 
+      }
     }
   } 
 
@@ -138,13 +148,26 @@ export default function ContentEdit(props: ContentEditProperties) {
    */
   function commitContent() {
     if (editor.current) {
-      const content = editor.current.getValue();
+      const author = getAuthor()
+      const token = getOauthToken()
+      if (author
+          && token
+          && author.name
+          && author.email) {
+        (async ()=> {
+          await commit(
+            props.contentId,
+            author.name!!, author.email!!, false, token)
+        })() 
+      }
     }  
   }
 
   return (
     <>
-      <ContentEditToolbar saveAction={saveContent} />
+      <ContentEditToolbar
+        saveAction={saveContent}
+        commitAction={commitContent} />
       <AccountLine />
       <EditAuthorLine />
       <Suspense fallback={<p>loading...</p>}>

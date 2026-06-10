@@ -17,6 +17,12 @@ class CustomHandler(http.server.CGIHTTPRequestHandler):
                         os.path.dirname(self.path), "index.html")  
         super().do_GET()
         
+    def run_cgi(self):
+
+        authorization = self.headers.get("authorization")
+        if authorization:
+            os.environ['AUTHORIZATION'] = authorization
+        super().run_cgi()
    
 def _get_best_family(*address):
     infos = socket.getaddrinfo(
