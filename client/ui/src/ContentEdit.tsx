@@ -1,20 +1,31 @@
 import { 
   useEffect, Suspense, startTransition, useState,
-  useRef
+  useRef, useId
 } from 'react'
-
+import { useNavigate } from 'react-router'
 import * as ace from 'ace-builds'
 import { 
   getContent,
   updateContentWithStr,
   commit
 } from 'awblog-base'
-import { editor as editorClass } from './ContentEdit.module.css'
+import { 
+  editor as editorClass
+} from './ContentEdit.module.css'
 import ContentEditToolbar from './ContentEditToolbar'
 import AccountLine from './AccountLine'
 import EditAuthorLine from './EditAuthorLine'
+import CommitOption from './CommitOption'
+import TitleAccordion from './TitleAccordion'
+import LinkSelect, { type LinkItem } from './LinkSelect'
+import LazyMessage, { type MessageControl } from './LazyMessage'
 import { getOauthToken } from './account'
 import { getAuthor } from './author'
+import { subscribe, setDeleteEditing, isDeleteEditing } from './commit-option'
+import { getDomainText } from './i18n'
+import { getEntries, getBaseIndex } from './index-entries'
+import { getEntryTitle } from './entry-title'
+import { setGotoNext, getGotoNext } from './content-edit-setting'
 
 /**
  * editor container object
@@ -49,11 +60,41 @@ type EditorProperties = {
   onEditorAttached?: ((editor: ace.Editor)=>void) 
 }
 
+/**
+ * create link item list
+ */
+function createLinkItems(): LinkItem[] {
+
+  let currentPath = ''
+  if (document.location) {
+    currentPath = document.location.pathname
+    if (currentPath.length) {
+      currentPath = currentPath.substring(1)
+    }
+  }
+  const entryTitle = getEntryTitle()
+  return getEntries()
+    .filter(item => item != currentPath)
+    .map(item => {
+      let title = entryTitle[item]
+      if (title) {
+        title = getDomainText('awblog', title as string)
+      }
+      return {
+        link: item,
+        title: title
+      }
+    })
+}
+
+
 
 /**
  * editor
  */
 function Editor(props: EditorProperties) {
+
+
   const [content, setContent] = useState()
   const [contentType, setContentType] = useState('')
   const [editor, setEditor] = useState<ace.Editor | null>(null)
@@ -118,6 +159,9 @@ function Editor(props: EditorProperties) {
 export default function ContentEdit(props: ContentEditProperties) {
 
   const editor = useRef<ace.Editor | null>(null)
+  const messageControl = useRef<MessageControl | null>(null)
+  const selectId = useId()
+  const navigate = useNavigate()
 
   /**
    * handle editor attached event.
@@ -155,12 +199,56 @@ export default function ContentEdit(props: ContentEditProperties) {
           && author.name
           && author.email) {
         (async ()=> {
-          await commit(
+          const deleteEditing = isDeleteEditing()
+          const resp = await commit(
             props.contentId,
-            author.name!!, author.email!!, false, token)
+            author.name!!, author.email!!, deleteEditing, token)
+          let succeeded = false
+          let message = ''
+          if (resp) {
+            const respJson = await resp.json()
+            if ('status' in respJson) {
+              succeeded = respJson.status == 'OK'
+            }
+            if ('message' in respJson) {
+              message = respJson.message
+            }
+          }
+          if (succeeded && deleteEditing) {
+            
+            const nextLink = getGotoNext() ?? getBaseIndex()   
+            navigate({
+              pathname: `/${nextLink}`,
+              search: document.location.search
+            })
+          } else {
+            if (messageControl.current) {
+              if (message) {
+                message = getDomainText('awblog', message)
+                messageControl.current.setMessage(`${message}`)
+              } else {
+                messageControl.current.setMessage('')
+              }
+            }
+          }
         })() 
       }
     }  
+  }
+
+
+  /**
+   * handle link select event
+   */
+  function handleLinkChanged(linkItem: LinkItem) {
+    setGotoNext(linkItem.link)
+  }
+
+  /**
+   * handle event about display message
+   */
+  function onReadyToDisplayMessage(control: MessageControl) {
+    messageControl.current = control
   }
 
   return (
@@ -168,6 +256,27 @@ export default function ContentEdit(props: ContentEditProperties) {
       <ContentEditToolbar
         saveAction={saveContent}
         commitAction={commitContent} />
+      <LazyMessage onReady={onReadyToDisplayMessage} />
+      <TitleAccordion
+        title={getDomainText('awblog', 'Commit option')}>
+        <CommitOption />
+        <div>
+          <div>
+            <label
+              htmlFor={selectId}
+              >{
+              getDomainText(
+                'awblog',
+                'Select the page to go to when you delete edit page.')
+            }</label>
+          </div>
+          <LinkSelect
+            id={selectId}
+            links={createLinkItems()}
+            onSelect={handleLinkChanged}
+            defaultValue={getGotoNext() ?? getBaseIndex() } />
+        </div>
+      </TitleAccordion>
       <AccountLine />
       <EditAuthorLine />
       <Suspense fallback={<p>loading...</p>}>

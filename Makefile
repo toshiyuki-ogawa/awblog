@@ -2,7 +2,9 @@
 deploy: deploy-local-python \
 	deploy-cgi \
 	deploy-secret \
-	deploy-awbconfig
+	deploy-awbconfig \
+	deploy-entry-title-json \
+	deploy-index-entries-json
 
 .PHONY: deploy
 
@@ -46,6 +48,23 @@ docroot/awbconfig-t.json : conf/awbconfig-t.json
 deploy-awbconfig-t: docroot/awbconfig-t.json 
 
 .PHONY: deploy-awbconfig-t
+
+
+deploy-entry-title-json: docroot/entry-title.json
+
+.PHONY: deploy-entry-title-json
+
+docroot/entry-title.json: client/ui/entry-title.json
+	cp $< $@
+
+docroot/index-entries.json: client/ui/index-entries.json
+	cp $< $@
+
+deploy-index-entries-json: docroot/index-entries.json
+
+.PHONY: deploy-index-entries-json
+
+
 
 
 local-python: | local-python-dir
@@ -123,5 +142,14 @@ client-ui-lint:
 	$(MAKE) -C client ui-lint
 
 .PHONY: client-ui-lint
+
+
+client/ui/index-entries.json: client-ui-index-entries-json
+
+
+client-ui-index-entries-json:
+	$(MAKE) -C client ui-index-entries-json
+
+.PHONY: client-ui-index-entries-json
 
 # vi: se ts=4 sw=4 noet:

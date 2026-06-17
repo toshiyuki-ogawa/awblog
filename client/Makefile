@@ -9,7 +9,6 @@ lint: base-lint ui-lint
 .PHONY: lint
 
 
-
 base-dist:
 	$(MAKE) -C base update-dist
 
@@ -30,5 +29,9 @@ ui-lint:
 
 .PHONY: ui-lint
 
+ui-index-entries-json:
+	$(MAKE) -C ui index-entries.json
+
+.PHONY: ui-index-entries-json
 
 # vi: se ts=4 sw=4 noet:

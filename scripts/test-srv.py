@@ -3,6 +3,7 @@ import os
 import sys
 import socket
 import traceback
+import awblog
 
 
 class CustomHandler(http.server.CGIHTTPRequestHandler):
@@ -10,11 +11,19 @@ class CustomHandler(http.server.CGIHTTPRequestHandler):
 
     def do_GET(self):
         path = self.translate_path(self.path)
+
         if not os.path.isdir(path):
-            _, ext = os.path.splitext(path)
-            if ".html" == ext:
+            resctl = awblog.ResCtrl()
+            base_name = os.path.basename(path)
+            new_base_name = resctl.get_resource(base_name)
+            if new_base_name:
                 self.path = os.path.join(
-                        os.path.dirname(self.path), "index.html")  
+                    os.path.dirname(self.path), new_base_name)  
+            #else:
+            #    _, ext = os.path.splitext(path)
+            #    if ".html" == ext:
+            #        self.path = os.path.join(
+            #                os.path.dirname(self.path), "index.html")  
         super().do_GET()
         
     def run_cgi(self):

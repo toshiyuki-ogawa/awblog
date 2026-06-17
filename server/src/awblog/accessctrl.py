@@ -41,6 +41,7 @@ class AccessCtrl:
             'edit-content': self.edit_content,
             'update-content': self.update_content,
             'update-header': self.update_header,
+            'commit': self.commit
         }
     def load_setting(self):
         """ load access control setting """
@@ -131,6 +132,18 @@ class AccessCtrl:
 
     def update_content(self, environ: dict, param: dict):
         """ access control for update content action """
+        return self.allow_request_contains_editor(environ)
+    def update_header(self, environ: dict, param: dict):
+        """ access control for update header action """
+        return True
+
+    def commit(self, environ: dict, param: dict):
+        """ access control for commit action """
+        return self.allow_request_contains_editor(environ)
+
+
+    def allow_request_contains_editor(self, environ: dict):
+        """ allow if request has the editor which is in editors list. """
         result = False
         try:
             email = self.read_email_from_bearer(environ) 
@@ -144,11 +157,6 @@ class AccessCtrl:
                 environ['wsgi.errors'],
                 traceback.format_exc())
         return result
-
-    def update_header(self, environ: dict, param: dict):
-        """ access control for update header action """
-        return True
-
 
 
 # vi: se ts=4 sw=4 et:

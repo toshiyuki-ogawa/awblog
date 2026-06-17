@@ -242,6 +242,7 @@ export async function commit(
     if (accessToken) {
       headers.append('Authorization', `Bearer ${accessToken}`)
     }
+    headers.append('Cache-Control', 'max-age=60')
  
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'commit')

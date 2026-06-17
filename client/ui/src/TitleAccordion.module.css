@@ -5,7 +5,7 @@
   transition: max-height 0.5s ease-out;
 }
 
-.accClose {
+.optionClose {
   max-height: 0;
 }
 

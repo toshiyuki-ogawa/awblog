@@ -1,17 +1,13 @@
 
 .accordion {
-  margin-left: var(--control-content-margin);
   overflow: hidden;
   transition: max-height 0.5s ease-out;
 }
 
-.accClose {
+.optionClose {
   max-height: 0;
 }
 
-.controlTitle {
-  cursor: pointer;
-}
 
 .controlTitle > *:first-child {
   margin-right: 1px;

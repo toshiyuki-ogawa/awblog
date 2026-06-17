@@ -502,6 +502,9 @@ class App:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
+        else:
+            self.response_access_denied(start_response, \
+                'Not allow to commit')
         return []
  
     def get_history_oids(self, environ, start_response, params: dict):

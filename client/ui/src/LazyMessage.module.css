@@ -1,0 +1,8 @@
+
+.messageBox {
+  margin-left: var(--control-content-margin);
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+/* vi: se ts=2 sw=2 et: */

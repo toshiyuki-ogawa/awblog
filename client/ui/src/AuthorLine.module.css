@@ -1,5 +1,6 @@
 
 .accordion {
+  margin-left: var(--control-content-margin);
   overflow: hidden;
   transition: max-height 0.5s ease-out;
 }
