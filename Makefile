@@ -4,7 +4,8 @@ deploy: deploy-local-python \
 	deploy-secret \
 	deploy-awbconfig \
 	deploy-entry-title-json \
-	deploy-index-entries-json
+	deploy-index-entries-json \
+	deploy-content-types
 
 .PHONY: deploy
 
@@ -64,8 +65,13 @@ deploy-index-entries-json: docroot/index-entries.json
 
 .PHONY: deploy-index-entries-json
 
+docroot/content-types.txt: client/ui/content-types.txt
+	cp $< $@
+
+deploy-content-types: docroot/content-types.txt
 
 
+.PHONY: deploy-content-types
 
 local-python: | local-python-dir
 	cp -r dtrack/src/* docroot/local/python

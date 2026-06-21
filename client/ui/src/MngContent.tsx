@@ -1,8 +1,13 @@
-import { useEffect, useState, startTransition, Suspense } from 'react'
-
+import {
+  useEffect, useState, startTransition,
+  useSyncExternalStore, Suspense
+} from 'react'
 import { getContentHeader } from 'awblog-base'
 
+import ContentTypeEdit from './ContentTypeEdit'
 import ContentEdit from './ContentEdit'
+import BinaryEdit, { isBinaryEditType } from './BinaryEdit'
+import { getOauthToken } from './account'
 
 
 /**
@@ -13,6 +18,10 @@ type ContentEditorProperties = {
    * content id
    */
   contentId: number
+  /**
+   * content type
+   */
+  contentType: string
 }
 
 /**
@@ -20,43 +29,27 @@ type ContentEditorProperties = {
  */
 type ContentEditorSelectorProperties = ContentEditorProperties
 
-
 /**
  * management content properties
  */
-type MngContentProperties = ContentEditorProperties
+type MngContentProperties = {
+  /**
+   * content id
+   */
+  contentId: number
+}
+
 
 
 /**
  * select content editor 
  */
 function ContentEditorSelector(props: ContentEditorSelectorProperties) {
-  const [contentType, setContentType] = useState('')
 
-  useEffect(()=>{ 
-    let doUpdate = true;
-    startTransition(async () => {
-      let contentResType = contentType
-      if (doUpdate) {
-        if (props.contentId) {
-          const headerRes = await getContentHeader(props.contentId, true)
-          if (headerRes) {
-            const headerJson = await headerRes.json()
-            if ('content-type' in headerJson) {
-              contentResType = headerJson['content-type']
-            }
-          }
-        } else {
-          contentResType = ''
-        }
-        setContentType(contentResType)
-      }
-    })
-    return ()=> { doUpdate = false }
-  }, [props.contentId])
-
-  if (contentType.indexOf('text') != -1) {
+  if (props.contentType.indexOf('text') != -1) {
     return <ContentEdit contentId={props.contentId} />
+  } else if (isBinaryEditType(props.contentType)) {
+    return <BinaryEdit contentId={props.contentId} />
   } else {
     return null
   }
@@ -68,12 +61,24 @@ function ContentEditorSelector(props: ContentEditorSelectorProperties) {
  */
 export default function MngContent(
   mngContentProps: MngContentProperties) {
+  const [contentType, setContentType] = useState('')
 
+  function contentTypeChanged(contentType: string) {
+    setContentType(contentType)
+  }
   
   return (
-    <Suspense fallback={<p>loading...</p>}> 
-      <ContentEditorSelector {... mngContentProps} />
-    </Suspense>
+    <>
+      <ContentTypeEdit
+        contentId={mngContentProps.contentId}
+        contentTypeChanged={contentTypeChanged}
+        /> 
+      <Suspense fallback={<p>loading...</p>}> 
+        <ContentEditorSelector 
+          contentId={mngContentProps.contentId}
+          contentType={contentType} />
+      </Suspense>
+    </>
   )
 }
 

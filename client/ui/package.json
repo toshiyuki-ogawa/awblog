@@ -26,6 +26,7 @@
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "ace-builds": "^1.44.0",
+    "mime": "^4.1.0",
     "react-markdown": "^10.1.0"
   },
   "dependencies": {

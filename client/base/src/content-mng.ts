@@ -212,11 +212,7 @@ export async function getContentHeader(
       method: 'GET',
       headers
     }
-    if (accessToken) {
-      const body = new URLSearchParams()
-      body.append('access-token', accessToken)
-      fetchOptions.body = body
-    }
+    
     const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
     
     if (res.ok && isOkResponse(res.headers)) {
@@ -346,5 +342,86 @@ export async function isEditing(
   }
   return result
 }
+
+/**
+ * list released items
+ */
+export async function listRelease(
+  accessToken?: string): Promise<any> {
+  let result = null 
+  const requestPath = getRequestPath()
+  if (requestPath) {
+    const headers = new Headers()
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
+    }
+    const searchParams = new URLSearchParams()
+    searchParams.append('action', 'list-release-id')
+    const fetchOptions: RequestInit = {
+      method: 'GET',
+      headers
+    }
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
+    if (res.ok && isOkResponse(res.headers)) {
+      result = res
+    }
+  }
+  return result
+}
+
+/**
+ * list editing items
+ */
+export async function listEditing(
+  accessToken?: string): Promise<any> {
+  let result = null 
+  const requestPath = getRequestPath()
+  if (requestPath) {
+    const headers = new Headers()
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
+    }
+    const searchParams = new URLSearchParams()
+    searchParams.append('action', 'list-editing-id')
+    const fetchOptions: RequestInit = {
+      method: 'GET',
+      headers
+    }
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
+    if (res.ok && isOkResponse(res.headers)) {
+      result = res
+    }
+  }
+  return result
+}
+
+/**
+ * list content 
+ */
+export async function listContent(
+  accessToken?: string): Promise<any> {
+  let result = null 
+  const requestPath = getRequestPath()
+  if (requestPath) {
+    const headers = new Headers()
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
+    }
+    const searchParams = new URLSearchParams()
+    searchParams.append('action', 'list-content')
+    const fetchOptions: RequestInit = {
+      method: 'GET',
+      headers
+    }
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
+    if (res.ok && isOkResponse(res.headers)) {
+      result = res
+    }
+  }
+  return result
+}
+
+
+
 
 // vi: se ts=2 sw=2 et:

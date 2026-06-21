@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import {
-  listCommit,
-  compareCommitItem,
-  type CommitItem
+  listContent,
+  type CommitItem,
+  type ContentItems,
 }  from 'awblog-base'
 import { getDomainText } from './i18n'
 
@@ -32,20 +32,76 @@ type ContentItemsProperties = {
   /**
    * items
    */
-  items: CommitItem[]
+  items: ContentItems
 }
 
+/**
+ * content attribute
+ */
+type ContentAttr = {
+  /**
+   * content id
+   */
+  contentId: number
+
+  /**
+   * object id if content is commited
+   */
+  oid?: string
+
+  /**
+   * content is released if this flag is true
+   */
+  release: boolean
+
+  /**
+   * content is editing if this flag is true
+   */
+  editing: boolean
+}
 
 /**
- * compare commit items
+ * compare content attribute
  */
-function compareCommitItems(a: CommitItem[], b: CommitItem[]): number {
+function compareContentAttr(a: ContentAttr, b: ContentAttr): number {
+  let result = 0
+  result = a.contentId - b.contentId
+  if (result == 0) {
+    if (a.oid && b.oid) {
+      if (a.oid < b.oid) {
+        result = -1
+      } else if (a.oid > b.oid) {
+        result = 1
+      } else {
+        result = 0
+      }
+    } else if (a.oid) {
+      result = 1
+    } else if (b.oid) {
+      result = -1
+    } else {
+      result = 0
+    }
+  }
+  if (result == 0) {
+    result = Number(a.release) - Number(b.release)
+  }
+  if (result == 0) {
+    result = Number(a.editing) - Number(b.editing)
+  }
+  return result
+}
+
+/**
+ * compare content attr
+ */
+function compareContentAttrs(a: ContentAttr[], b: ContentAttr[]): number {
 
   let result = 0
 
   const compLen = Math.min(a.length, b.length)
   for (let idx = 0; idx < compLen; idx++) {
-    result = compareCommitItem(a[idx], b[idx])
+    result = compareContentAttr(a[idx], b[idx])
     if (result) {
       break
     }
@@ -56,6 +112,52 @@ function compareCommitItems(a: CommitItem[], b: CommitItem[]): number {
   return result
 }
 
+/**
+ * convert from content items to content attributes list
+ */
+function contentItemsToConentAttrs(
+  contentItems: ContentItems): ContentAttr[] {
+
+  const releaseIds = new Set<number>(contentItems.release)
+  const editingIds = new Set<number>(contentItems.editing)
+  const processedIds = new Set<number>() 
+  const idAttrs = new Map<number, ContentAttr>()
+
+  contentItems.commits.forEach(item => {
+    const contentId = parseInt(item.name)
+    processedIds.add(contentId)
+    idAttrs.set(contentId, {
+      contentId,
+      oid: item.oid,
+      release: contentId in releaseIds,
+      editing: contentId in editingIds,
+    })
+  })
+  
+  const restReleaseIds = releaseIds.difference(processedIds)
+  restReleaseIds.forEach(contentId => {
+    processedIds.add(contentId)
+    idAttrs.set(contentId, {
+      contentId,
+      release: true,
+      editing: contentId in editingIds 
+    })
+  })
+  const restEditingIds = editingIds.difference(processedIds)
+  restEditingIds.forEach(contentId => {
+    idAttrs.set(contentId, {
+      contentId,
+      release: false,
+      editing: true
+    })
+  })
+
+  const result: ContentAttr[] = idAttrs
+    .keys().toArray().sort().map(id => idAttrs.get(id)!!)
+
+  return result
+}
+
 
 /**
  * create list elements
@@ -63,7 +165,7 @@ function compareCommitItems(a: CommitItem[], b: CommitItem[]): number {
 function createContents(
   lineNumber: number,
   countPerPage: number,
-  items: CommitItem[]): ReactNode[]  {
+  items: ContentAttr[]): ReactNode[]  {
 
   const lineIndex = lineNumber - 1
   const pageIndex = Math.floor(lineIndex / countPerPage)
@@ -75,12 +177,24 @@ function createContents(
       <>
         <li>
           <dl>
-            <dt>id</dt>
-            <dd>{item.name}</dd>
-            <dt>oid</dt>
+            <dt>{getDomainText('awblog', 'id')}</dt>
+            <dd>{item.contentId}</dd>
+            <dt>{getDomainText('awblog', 'oid')}</dt>
             <dd>{item.oid}</dd>
+            <dt>{getDomainText('awblog', 'release')}</dt>
+            <dd>{
+              getDomainText(
+                'awblog',
+                item.release ? 'release' : 'not release')
+            }</dd>
+            <dt>{getDomainText('awblog', 'editing')}</dt>
+            <dd>{
+              getDomainText(
+                'awblog',
+                item.editing ? 'editing' : 'not editing')
+            }</dd>
             <dt>{getDomainText('awblog', 'Preview')}</dt>
-            <dd><ContentPreview contentId={parseInt(item.name)} /></dd>
+            <dd><ContentPreview contentId={item.contentId} /></dd>
           </dl>
         </li>
       </>
@@ -96,17 +210,17 @@ function createContents(
  */
 export default function ContentList(
   props: ContentListProperties) {
-  const [contentItems, setContentItems] = useState<CommitItem[]>([])
+  const [contentAttrs, setContentAttrs] = useState<ContentAttr[]>([])
   useEffect(() => {
     let doUpdate = true;
     (async () => {
-      const res = await listCommit()
+      const res = await listContent()
       if (res.ok) {
         const jsonObj = await res.json()
-        if (jsonObj.items && doUpdate) {
-          const items = jsonObj.items as CommitItem[]
-          if (compareCommitItems(items, contentItems)) {
-            setContentItems(items)
+        if (doUpdate) {
+          const items = contentItemsToConentAttrs(jsonObj as ContentItems)
+          if (compareContentAttrs(items, contentAttrs)) {
+            setContentAttrs(items)
           }
         }
       }
@@ -114,12 +228,12 @@ export default function ContentList(
     return () => {
       doUpdate = false
     }
-  }, [contentItems, props.lineNumber, props.countPerPage]) 
+  }, [props.lineNumber, props.countPerPage]) 
 
   return (
     <>
      <ol>
-      {createContents(props.lineNumber, props.countPerPage, contentItems)}
+      {createContents(props.lineNumber, props.countPerPage, contentAttrs)}
      </ol>
     </>
   )

@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router'
 import AppRoutes from './AppRoutes'
 import { init as initAwblog }  from 'awblog-base'
 import { loadI18nSetting } from './i18n'
+import { loadContentTypes } from './content-types'
 import loadDataFromStorage from './storage'
 import { init as initAccount } from './account'
 import { loadEntryTitle } from './entry-title'
@@ -32,6 +33,7 @@ import { loadIndexEntries } from './index-entries'
   await initAwblog()
   await loadEntryTitle()
   await loadIndexEntries("index.html")
+  await loadContentTypes() 
   loadDataFromStorage()
   initAccount()
   createRoot(document.getElementById('main')!).render(

@@ -33,7 +33,10 @@ class App:
             'commit': self.commit,
             'get-history': self.get_history_oids,
             'list-commit': self.list_commit,
-            'is-editing': self.is_editing
+            'is-editing': self.is_editing,
+            'list-release-id': self.list_release_id,
+            'list-editing-id': self.list_editing_id,
+            'list-content': self.list_content
         }
 
     
@@ -548,7 +551,6 @@ class App:
         """ list commit """
         if self.access_ctrl.allow_access(environ, params):
             try:
-
                 tree_oid = None
                 for oid in self.dtrack_app.iterate_commit_tree():
                     tree_oid = oid
@@ -618,5 +620,114 @@ class App:
                         [])
         return []
 
+    def list_release_id(self, environ, start_response, params: dict):
+        """ list release id"""
+        if self.access_ctrl.allow_access(environ, params):
+            try:
+                write = self.set_response(
+                        start_response,
+                        http.HTTPStatus.ACCEPTED,
+                        http.HTTPStatus.ACCEPTED.phrase,
+                        [("content-type", "application/json")])
+     
+                
+                res = {
+                    'ids': [x for x in self.dtrack_app.list_content_id()],
+                    'status': 'OK'
+                }
+                write(json.dumps(res).encode())
+            except:
+                log.Log.print_log_warn_into_stream(
+                        environ['wsgi.errors'],
+                        repr(sys.exception()))
+                log.Log.print_log_warn_into_stream(
+                        environ['wsgi.errors'],
+                        traceback.format_exc())
+                self.set_response(
+                        start_response,
+                        http.HTTPStatus.INTERNAL_SERVER_ERROR,
+                        http.HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
+                        [])
 
+ 
+        return []
+ 
+    def list_editing_id(self, environ, start_response, params: dict):
+        """ list editing id"""
+        if self.access_ctrl.allow_access(environ, params):
+            try:
+                write = self.set_response(
+                        start_response,
+                        http.HTTPStatus.ACCEPTED,
+                        http.HTTPStatus.ACCEPTED.phrase,
+                        [("content-type", "application/json")])
+                
+                res = {
+                    'ids': [
+                        x for x in self.dtrack_app.list_editing_content_id()
+                    ],
+                    'status': 'OK'
+                }
+                write(json.dumps(res).encode())
+            except:
+                log.Log.print_log_warn_into_stream(
+                        environ['wsgi.errors'],
+                        repr(sys.exception()))
+                log.Log.print_log_warn_into_stream(
+                        environ['wsgi.errors'],
+                        traceback.format_exc())
+                self.set_response(
+                        start_response,
+                        http.HTTPStatus.INTERNAL_SERVER_ERROR,
+                        http.HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
+                        [])
+
+        return []
+
+    def list_content(self, environ, start_response, params: dict):
+        """ list content information  """
+        if self.access_ctrl.allow_access(environ, params):
+            try:
+                tree_oid = None
+                for oid in self.dtrack_app.iterate_commit_tree():
+                    tree_oid = oid
+                    break
+                commit_items = []
+                if tree_oid:
+                    commit_items = [
+                        x for x in self.dtrack_app.iterate_tree_items(tree_oid)
+                    ]
+                editing_ids = [
+                    x for x in self.dtrack_app.list_editing_content_id()
+                ]
+                release_ids = [
+                    x for x in self.dtrack_app.list_content_id()
+                ]
+                res = {
+                    'commits': commit_items,
+                    'release': release_ids,
+                    'editing': editing_ids,
+                    'status': 'OK'
+                }
+                write = self.set_response(
+                        start_response,
+                        http.HTTPStatus.ACCEPTED,
+                        http.HTTPStatus.ACCEPTED.phrase,
+                        [("content-type", "application/json")])
+                write(json.dumps(res).encode())
+            except:
+                log.Log.print_log_warn_into_stream(
+                        environ['wsgi.errors'],
+                        repr(sys.exception()))
+                log.Log.print_log_warn_into_stream(
+                        environ['wsgi.errors'],
+                        traceback.format_exc())
+                self.set_response(
+                        start_response,
+                        http.HTTPStatus.INTERNAL_SERVER_ERROR,
+                        http.HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
+                        [])
+
+        return []
+ 
 # vi: se ts=4 sw=4 et:
