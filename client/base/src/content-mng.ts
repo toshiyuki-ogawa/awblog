@@ -17,10 +17,9 @@ function isOkResponse(headers: Headers): boolean {
 /**
  * create content
  */
-export async function createContent(accessToken?: string):
-  Promise<number | undefined> {
-
-  let result
+export async function createContent(
+  accessToken?: string): Promise<Response | null> {
+  let result = null
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
@@ -36,11 +35,8 @@ export async function createContent(accessToken?: string):
       method: 'POST'
     }
     const res = await fetch(requestUrl, fetchOptions)
-    if (res.ok) {
-      if (isOkResponse(res.headers)) {
-        const jsonObj = await res.json()
-        result = jsonObj['content-id']
-      }
+    if (res.ok && isOkResponse(res.headers)) {
+      result = res
     }
   }
   return result
@@ -52,8 +48,8 @@ export async function createContent(accessToken?: string):
 export async function updateContentWithStr(
   contentId: number,
   content: string,
-  accessToken?: string): Promise<boolean> {
-  let result = false
+  accessToken?: string): Promise<Response | null> {
+  let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
@@ -72,8 +68,8 @@ export async function updateContentWithStr(
       headers,
       body
     })
-    if (res.ok) {
-      result = isOkResponse(res.headers)
+    if (res.ok && isOkResponse(res.headers)) {
+      result = res
     }
   }
   return result
@@ -85,8 +81,8 @@ export async function updateContentWithStr(
 export async function updateContentWithBlob(
   contentId: number,
   content: Blob,
-  accessToken?: string): Promise<boolean> {
-  let result = false
+  accessToken?: string): Promise<Response | null> {
+  let result = null
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
@@ -104,8 +100,8 @@ export async function updateContentWithBlob(
       headers,
       body
     })
-    if (res.ok) {
-      result = isOkResponse(res.headers)
+    if (res.ok && isOkResponse(res.headers)) {
+      result = res
     }
   }
   return result
@@ -117,7 +113,7 @@ export async function updateContentWithBlob(
 export async function getContent(
   contentId: number,
   edit?: boolean,
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -157,8 +153,8 @@ export async function getContent(
 export async function updateContentHeader(
   contentId: number,
   contentHeader: { [key: string]: any },
-  accessToken?: string): Promise<boolean> {
-  let result = false
+  accessToken?: string): Promise<Response | null> {
+  let result = null
   const requestPath = getRequestPath()
   if (requestPath) {
     const headers = new Headers()
@@ -179,8 +175,8 @@ export async function updateContentHeader(
       body,
       headers
     })
-    if (res.ok) {
-      result = isOkResponse(res.headers)
+    if (res.ok && isOkResponse(res.headers)) {
+      result = res
     }
   }
   return result
@@ -192,7 +188,7 @@ export async function updateContentHeader(
 export async function getContentHeader(
   contentId: number,
   edit?: boolean,
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -230,7 +226,7 @@ export async function commit(
   author: string,
   email: string,
   deleteEditing?: boolean,
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -265,7 +261,7 @@ export async function commit(
  */
 export async function getHistoryOids(
   contentId: number,
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -293,7 +289,7 @@ export async function getHistoryOids(
  * list commited items
  */
 export async function listCommit(
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -320,7 +316,7 @@ export async function listCommit(
  */
 export async function isEditing(
   contentId: number,
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -347,7 +343,7 @@ export async function isEditing(
  * list released items
  */
 export async function listRelease(
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -373,7 +369,7 @@ export async function listRelease(
  * list editing items
  */
 export async function listEditing(
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -399,7 +395,7 @@ export async function listEditing(
  * list content 
  */
 export async function listContent(
-  accessToken?: string): Promise<any> {
+  accessToken?: string): Promise<Response | null> {
   let result = null 
   const requestPath = getRequestPath()
   if (requestPath) {
@@ -420,8 +416,5 @@ export async function listContent(
   }
   return result
 }
-
-
-
 
 // vi: se ts=2 sw=2 et:

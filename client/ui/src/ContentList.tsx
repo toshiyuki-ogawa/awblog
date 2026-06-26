@@ -215,7 +215,7 @@ export default function ContentList(
     let doUpdate = true;
     (async () => {
       const res = await listContent()
-      if (res.ok) {
+      if (res && res.ok) {
         const jsonObj = await res.json()
         if (doUpdate) {
           const items = contentItemsToConentAttrs(jsonObj as ContentItems)

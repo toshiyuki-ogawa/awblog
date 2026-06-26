@@ -1,25 +1,52 @@
-import { useEffect, useState, useId } from 'react'
+import { 
+  useEffect, useEffectEvent, useRef, useState, useId,
+  useSyncExternalStore
+} from 'react'
 
 import { getContentHeader, updateContentHeader } from 'awblog-base'
 import { getOauthToken } from './account'
 import { getContentTypes } from './content-types'
+import { type ContentTypeMng } from './content-type-mng'
+import { getDomainText } from './i18n'
+
+/**
+ * content type ui control
+ */
+export type ContentTypeUiControl = {
+
+  /**
+   * set user interface content type
+   */
+  setContentType: ((contentType: string)=>void)
+
+  /**
+   * get user intersafe content type
+   */
+  getContentType: (()=>string)
+}
+
+
 
 /**
  * edit content type properties
  */
 type ContentTypeEditProperties = {
-  /**
-   * content id
-   */
-  contentId: number
 
+  /**
+   * content type management
+   */
+  contentTypeMng: ContentTypeMng 
 
   /**
    * notified if content type changed
    */
-  contentTypeChanged?: ((contentType: string) => void)
-}
+  contentTypeUpdated?: ((contentType: string) => void)
 
+  /**
+   * notified when user interface control is ready to use.
+   */
+  uiControlAttached?: ((control: ContentTypeUiControl) => void)
+}
 
 
 /**
@@ -27,10 +54,10 @@ type ContentTypeEditProperties = {
  */
 async function updateContentType(
   contentId: number,
-  contentType: string): Promise<boolean> {
+  contentType: string): Promise<Response | null> {
   const contentHeaderRes = await getContentHeader(
     contentId, true, getOauthToken() ?? undefined) 
-  let result = false
+  let result = null
   if (contentHeaderRes) {
       const contentHeader = await contentHeaderRes.json()
       contentHeader['content-type'] = contentType
@@ -38,7 +65,7 @@ async function updateContentType(
         contentId,
         contentHeader,
         getOauthToken() ?? undefined)
-      result = res ? true : false
+      result = res
   }
   return result
 }
@@ -51,42 +78,36 @@ async function updateContentType(
 export default function ContentTypeEdit(
   props: ContentTypeEditProperties) {
 
-  const [contentType, setContentType] = useState('')
+  const contentTypeRef = useRef<HTMLInputElement | null>(null)
   const itemsId = useId()
+  const contentType = useSyncExternalStore(
+    props.contentTypeMng.subscribe, props.contentTypeMng.getContentType)
 
-  useEffect(()=> {
-    (async ()=> {
-      const contentHeaderRes = await getContentHeader(
-        props.contentId, true,
-        getOauthToken() ?? undefined) 
-      if (contentHeaderRes) {
-        const contentHeader = await contentHeaderRes.json()
-        setContentType(contentHeader['content-type'] ?? '') 
-      } else {
-        setContentType('')
-      }
-    })()
-  })
-
-  useEffect(() => {
-    if (props.contentTypeChanged) {
-      props.contentTypeChanged(contentType)
-    }
-
-  }, [contentType])
 
   /**
    * form action
    */
-  async function action(formData: FormData) {
+  async function action(formData: FormData): Promise<void> {
     const contentType = formData.get("content-type") as string
-    const res = await updateContentType(
-      props.contentId, contentType)  
-    if (res) {
-      setContentType(contentType)
+    const modifyAction = formData.get("modify") as string
+    if (modifyAction == "save") {
+      const res = await props.contentTypeMng.updateContentType(contentType)  
+      let updated = false 
+      if (res) {
+        const jsonRes = await res.json()
+        if (jsonRes['Status'] === 'OK') {
+          updated = true
+        } else {
+          // notifiy error message
+        }
+      }
+      if (!updated) {
+        props.contentTypeMng.setContentType(contentType)
+      }
+    } else {
+      await props.contentTypeMng.loadContentType()
     }
   }
-
   return (
     <>
       <form action={action}> 
@@ -95,7 +116,16 @@ export default function ContentTypeEdit(
           defaultValue={contentType} 
           list={itemsId}
           />
-        <input type="submit" />
+        <button name="modify" value="save">
+          {
+            getDomainText('awblog', 'Save')
+          }
+        </button>
+        <button name="modify" value="load">
+          {
+            getDomainText('awblog', 'Load')
+          }
+        </button>
         <datalist id={itemsId}>
           {
             getContentTypes().map(item => <option value={item[0]} />)

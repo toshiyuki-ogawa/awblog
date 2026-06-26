@@ -27,7 +27,7 @@ type PublicContentProperties = ContentProperties
  */
 function Content(props: ContentProperties) {
   
-  const [content, setContent] = useState()
+  const [content, setContent] = useState<any>()
   const [contentType, setContentType] = useState('')
   
   useEffect(()=>{ 
@@ -38,12 +38,14 @@ function Content(props: ContentProperties) {
       if (doUpdate) {
         if (props.contentId) {
           const contentRes = await getContent(props.contentId)
-          contentResType = contentRes.headers.get('Content-Type') ?? ''
-          if (contentResType) {
-            if (contentResType.indexOf('text') != -1) {
-              contentResData = await contentRes.text()
-            } else {
-              contentResData = undefined
+          if (contentRes) {
+            contentResType = contentRes.headers.get('Content-Type') ?? ''
+            if (contentResType) {
+              if (contentResType.indexOf('text') != -1) {
+                contentResData = await contentRes.text()
+              } else {
+                contentResData = undefined
+              }
             }
           }
         } else {

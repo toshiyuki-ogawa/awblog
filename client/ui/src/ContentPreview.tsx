@@ -27,15 +27,17 @@ type PreviewProperties = {
  * preview
  */
 function Preview(props: PreviewProperties) {
-  const [content, setContent] = useState()
+  const [content, setContent] = useState<string | undefined>()
 
   startTransition(async ()=>{ 
     if (props.contentId) {
       const contentRes = await getContent(props.contentId)
-      const contentType = contentRes.headers.get('Content-Type') 
-      if (contentType) {
-        if (contentType.indexOf('text') != -1) {
-          setContent(await contentRes.text())
+      if (contentRes) {
+        const contentType = contentRes.headers.get('Content-Type') 
+        if (contentType) {
+          if (contentType.indexOf('text') != -1) {
+            setContent(await contentRes.text())
+          }
         }
       }
     }

@@ -1,9 +1,8 @@
 import { 
   useEffect, Suspense, startTransition, useState,
-  useRef, useId
+  useRef, useId, useSyncExternalStore
 } from 'react'
 import { useNavigate } from 'react-router'
-import * as ace from 'ace-builds'
 import { 
   getContent,
   updateContentWithStr,
@@ -19,6 +18,9 @@ import CommitOption from './CommitOption'
 import TitleAccordion from './TitleAccordion'
 import LinkSelect, { type LinkItem } from './LinkSelect'
 import LazyMessage, { type MessageControl } from './LazyMessage'
+import TextEdit from './TextEdit'
+import BinaryEdit from './BinaryEdit'
+import ContentTypeEdit, { type ContentTypeUiControl } from './ContentTypeEdit'
 import { getOauthToken } from './account'
 import { getAuthor } from './author'
 import { subscribe, setDeleteEditing, isDeleteEditing } from './commit-option'
@@ -26,13 +28,9 @@ import { getDomainText } from './i18n'
 import { getEntries, getBaseIndex } from './index-entries'
 import { getEntryTitle } from './entry-title'
 import { setGotoNext, getGotoNext } from './content-edit-setting'
-
-/**
- * editor container object
- */
-type EditorContainer = {
-  ref: ace.Editor | null
-}
+import { type DataControl } from './data-control'
+import { getContentTypes } from './content-types'
+import { createContentTypeMng } from './content-type-mng'
 
 
 /**
@@ -43,21 +41,6 @@ type ContentEditProperties = {
    * content id
    */
   contentId: number
-}
-
-/**
- * editor properties
- */
-type EditorProperties = {
-  /**
-   * content id
-   */
-  contentId: number
-
-  /**
-   * when editor is attached
-   */
-  onEditorAttached?: ((editor: ace.Editor)=>void) 
 }
 
 /**
@@ -87,153 +70,147 @@ function createLinkItems(): LinkItem[] {
     })
 }
 
-
-
 /**
- * editor
+ * commit content
  */
-function Editor(props: EditorProperties) {
-
-
-  const [content, setContent] = useState()
-  const [contentType, setContentType] = useState('')
-  const [editor, setEditor] = useState<ace.Editor | null>(null)
-  const editorRef = useRef<HTMLDivElement | null>(null)
-  
-  useEffect(()=>{ 
-    let doUpdate = true;
-    startTransition(async () => {
-      let contentResType = contentType
-      let contentResData = content
-      if (doUpdate) {
-        if (props.contentId) {
-          const contentRes = await getContent(props.contentId, true)
-          contentResType = contentRes.headers.get('Content-Type') ?? ''
-          if (contentResType) {
-            if (contentResType.indexOf('text') != -1) {
-              contentResData = await contentRes.text()
-            } else {
-              contentResData = undefined
-            }
-          }
-        } else {
-          contentResType = ''
-          contentResData = undefined
-        }
-        setContentType(contentResType)
-        setContent(contentResData)
+async function commitContent(
+  contentId: number,
+  deleteEditing: boolean,
+  messageControl: MessageControl | null = null): Promise<boolean> {
+  const author = getAuthor()
+  const token = getOauthToken()
+  let result = false
+  if (author
+      && token
+      && author.name
+      && author.email) {
+    const resp = await commit(
+      contentId,
+      author.name!!, author.email!!, deleteEditing, token)
+    let succeeded = false
+    let message = ''
+    if (resp) {
+      const respJson = await resp.json()
+      if ('status' in respJson) {
+        succeeded = respJson.status == 'OK'
       }
-    })
-    return ()=> { doUpdate = false }
-  }, [props.contentId])
-
-
-  useEffect(()=> {
-    if (editorRef.current && !editor) {
-      const el = editorRef.current
-      const aceEditor = ace.edit(el)
-      setEditor(aceEditor)
-      if (props.onEditorAttached) {
-        props.onEditorAttached(aceEditor)
+      if ('message' in respJson) {
+        message = respJson.message
       }
     }
-  }, [content])
-
-  useEffect(()=> {
-    if (editor) {
-      editor.setValue(content ?? '')
-    } 
-  }, [content, editor])
-
-  if (contentType.indexOf('text') != -1 && content) {
-    return <div className={editorClass} ref={editorRef}></div>
-  } else {
-    return null
+    if (succeeded) {
+      result = true
+    } else {
+      if (messageControl) {
+        if (message) {
+          message = getDomainText('awblog', message)
+          messageControl.setMessage(`${message}`)
+        } else {
+          messageControl.setMessage('')
+        }
+      }
+    }
   }
+  return result
 }
 
+/**
+ * you get true if content type is supported by content edit module
+ */
+function isSupportedContentType(contentType: string): boolean {
+  return getContentTypes()
+    .find((item) => item[0] == contentType) ? true : false 
+}
+
+/**
+ * select edtitor type from content type
+ */
+function selectEditorTypeWithContentType(
+  contentType: string): string | null {
+ 
+  let result = null
+  if (isSupportedContentType(contentType)) {
+    if (contentType.indexOf("text") != -1) {
+      result = "text"
+    } else {
+      result = "binary"
+    }
+  }   
+  return result
+}
 
 /**
  * edit content 
  */
 export default function ContentEdit(props: ContentEditProperties) {
 
-  const editor = useRef<ace.Editor | null>(null)
   const messageControl = useRef<MessageControl | null>(null)
   const selectId = useId()
   const navigate = useNavigate()
+  const textEditControl = useRef<DataControl | null>(null)
+  const binaryEditControl = useRef<DataControl | null>(null)
+  const contentTypeUiControl = useRef<ContentTypeUiControl  | null>(null)
+  const contentTypeMng = createContentTypeMng(props.contentId) 
+
+
+  useEffect(()=> {
+    let doRun = true;
+    (async ()=>{
+      if (doRun) {
+        await contentTypeMng.loadContentType()
+      }
+    })() 
+    return ()=> {
+      doRun = false
+    }
+  }, [props.contentId])
 
   /**
-   * handle editor attached event.
+   * handle text edit data control attached event
    */
-  function onEditorAttached(aceEditor: ace.Editor) {
-    editor.current = aceEditor
+  function onTextEditControlAttached(dataControl: DataControl) {
+    textEditControl.current = dataControl
+  }
+
+  /**
+   * handle binary edit data control attached event
+   */
+  function onBinaryEditControlAttached(dataControl: DataControl) {
+    binaryEditControl.current = dataControl
   }
 
   /**
    * save content
    */
   function saveContent() {
-    if (editor.current) {
-      const token = getOauthToken()
-      if (token) {
-        const content = editor.current.getValue();
-
-        (async () => {
-          await updateContentWithStr(
-            props.contentId, content, token)
-        })() 
-      }
+    if (textEditControl.current) {
+      textEditControl.current.save()
     }
   } 
+
+
+  /**
+   * handle control ui control attached event
+   */
+  function contentTypeUiControlAttached(uiControl: ContentTypeUiControl) {
+    contentTypeUiControl.current = uiControl
+  }
 
   /**
    * commit content
    */
-  function commitContent() {
-    if (editor.current) {
-      const author = getAuthor()
-      const token = getOauthToken()
-      if (author
-          && token
-          && author.name
-          && author.email) {
-        (async ()=> {
-          const deleteEditing = isDeleteEditing()
-          const resp = await commit(
-            props.contentId,
-            author.name!!, author.email!!, deleteEditing, token)
-          let succeeded = false
-          let message = ''
-          if (resp) {
-            const respJson = await resp.json()
-            if ('status' in respJson) {
-              succeeded = respJson.status == 'OK'
-            }
-            if ('message' in respJson) {
-              message = respJson.message
-            }
-          }
-          if (succeeded && deleteEditing) {
-            
-            const nextLink = getGotoNext() ?? getBaseIndex()   
-            navigate({
-              pathname: `/${nextLink}`,
-              search: document.location.search
-            })
-          } else {
-            if (messageControl.current) {
-              if (message) {
-                message = getDomainText('awblog', message)
-                messageControl.current.setMessage(`${message}`)
-              } else {
-                messageControl.current.setMessage('')
-              }
-            }
-          }
-        })() 
-      }
-    }  
+  async function handleCommitContent() {
+    const deleteEditing = isDeleteEditing()
+    const res = await commitContent(
+      props.contentId, deleteEditing, messageControl.current)
+
+    if (res && deleteEditing) {
+      const nextLink = getGotoNext() ?? getBaseIndex()   
+      navigate({
+        pathname: `/${nextLink}`,
+        search: document.location.search
+      })
+    }
   }
 
 
@@ -251,12 +228,37 @@ export default function ContentEdit(props: ContentEditProperties) {
     messageControl.current = control
   }
 
+  /**
+   * content editor
+   */
+  function ContentEditor() {
+    const contentType = useSyncExternalStore(
+      contentTypeMng.subscribe, contentTypeMng.getContentType)
+    const editorType = selectEditorTypeWithContentType(contentType)
+
+    if (editorType == "text") {
+      return (
+        <TextEdit
+          contentTypeMng={contentTypeMng}
+          onDataControlAttached={onTextEditControlAttached}
+          { ...props }
+        />
+      )
+    } else if (editorType == "binary") {
+      return (
+        <BinaryEdit
+          contentTypeMng={contentTypeMng}
+          onDataControlAttached={onBinaryEditControlAttached}
+          { ...props }
+        />
+      )
+    } else {
+      return null
+    }
+  }
+
   return (
     <>
-      <ContentEditToolbar
-        saveAction={saveContent}
-        commitAction={commitContent} />
-      <LazyMessage onReady={onReadyToDisplayMessage} />
       <TitleAccordion
         title={getDomainText('awblog', 'Commit option')}>
         <CommitOption />
@@ -279,11 +281,16 @@ export default function ContentEdit(props: ContentEditProperties) {
       </TitleAccordion>
       <AccountLine />
       <EditAuthorLine />
+      <LazyMessage onReady={onReadyToDisplayMessage} />
+      <ContentTypeEdit
+        contentTypeMng={contentTypeMng}
+        uiControlAttached={contentTypeUiControlAttached}
+        /> 
+      <ContentEditToolbar
+        saveAction={saveContent}
+        commitAction={handleCommitContent} />
       <Suspense fallback={<p>loading...</p>}>
-        <Editor 
-          onEditorAttached={onEditorAttached}
-          { ...props } />
-
+        <ContentEditor />
       </Suspense>
     </>
   )

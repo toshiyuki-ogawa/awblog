@@ -9,6 +9,20 @@ import {
 import { getOauthToken } from './account'
 import mime from 'mime'
 import { type DataControl } from './data-control'
+import { type ContentTypeMng } from './content-type-mng'
+
+/**
+ *  binary edit data control
+ */
+export type BinaryEditDataControl = {
+
+  /**
+   * save data
+   */
+  save: (()=>void)
+
+}
+
 
 /**
  * header edit properties
@@ -20,9 +34,20 @@ type BinaryEditProperties = {
   contentId: number
 
   /**
+   * content type management
+   */
+  contentTypeMng: ContentTypeMng 
+
+  /**
    * on data contrl attached
    */
   onDataControlAttached?: ((dataConrol: DataControl)=>void)
+
+
+  /**
+   * content type changed
+   */
+  onContentTypeUpdated?: ((contentType: string) => void)
 }
 
 /**
@@ -45,19 +70,22 @@ function nameToType(name: string): string {
  * update contents and get content
  */
 async function updateContent(
-  contentId: number, file?: File): Promise<Response | null> {
+  contentId: number, 
+  file?: File,
+  contentTypeUpdated?: ((type: string)=>void)): Promise<Response | null> {
   let result = null
   if (file) {
 
-    const headerRes = await getContentHeader(
+    const res = await getContentHeader(
       contentId, true, getOauthToken() ?? undefined)
 
-    if (headerRes) {
+    if (res) {
 
       let contentType = file.type
       if (!contentType) {
         contentType = nameToType(file.name)
       }
+      const headerRes = await res.json()
       const contentHeader = { ...headerRes }
       contentHeader['content-type'] = contentType
     
@@ -69,6 +97,9 @@ async function updateContent(
           contentId, contentHeader, getOauthToken() ?? undefined)
       }
       if (updateRes) {
+        if (contentTypeUpdated) {
+          contentTypeUpdated(contentType)
+        }
         result = await getContent(
           contentId, true, getOauthToken() ?? undefined)
       }
@@ -107,14 +138,19 @@ export default function BinaryEdit(
       if (submitType == "file") {
         if (files.length) {
           setFile(files[0])
+          
         } else {
           setFile(undefined)
         }
       } else {
         if (files.length) {
-          setBlobResponse(await updateContent(props.contentId, files[0]))
+          setBlobResponse(
+            await updateContent(
+              props.contentId, files[0], props.onContentTypeUpdated))
         } else {
-          setBlobResponse(await updateContent(props.contentId, undefined))
+          setBlobResponse(
+            await updateContent(
+              props.contentId, undefined, props.onContentTypeUpdated))
         }
       }
     }
@@ -128,13 +164,26 @@ export default function BinaryEdit(
       if (imgInputElement.current) {
         const files = imgInputElement.current.files as FileList
          if (files.length) {
-          setBlobResponse(await updateContent(props.contentId, files[0]))
+          setBlobResponse(
+            await updateContent(
+              props.contentId, files[0], props.onContentTypeUpdated))
         } else {
-          setBlobResponse(await updateContent(props.contentId, undefined))
+          setBlobResponse(
+            await updateContent(
+              props.contentId, undefined, props.onContentTypeUpdated))
         }
       }
     })()
   }
+  useEffect(()=> {
+    if (file) {
+      let contentType = file.type
+      if (!contentType) {
+        contentType = nameToType(file.name)
+      }
+      props.contentTypeMng.setContentType(contentType)
+    }
+  }, [file])
 
   useEffect(()=> {
     if (props.onDataControlAttached) {

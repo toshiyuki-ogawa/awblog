@@ -135,7 +135,7 @@ class AccessCtrl:
         return self.allow_request_contains_editor(environ)
     def update_header(self, environ: dict, param: dict):
         """ access control for update header action """
-        return True
+        return self.allow_request_contains_editor(environ)
 
     def commit(self, environ: dict, param: dict):
         """ access control for commit action """
