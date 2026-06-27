@@ -1,5 +1,33 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useId } from 'react'
 import mime from 'mime'
+import { getDomainText } from './i18n'
+
+/**
+ * embeded component properties
+ */
+type EmbededProperties = {
+
+  /**
+   * content data
+   */
+  blob?: Blob
+
+
+  /**
+   * content type
+   */
+  contentType: string
+
+  /**
+   * initial width
+   */
+  width?: number
+
+  /**
+   * initial height
+   */
+  height?: number
+}
 
 /**
  * blob preview properties
@@ -39,6 +67,74 @@ function isImageType(contentType: string): boolean {
   let result = supportTypes
     .findIndex(type => contentType.indexOf(type) != -1) !== -1
   return result
+}
+
+
+/**
+ * embeded properties
+ */
+function Embeded(props: EmbededProperties) {
+
+  const [width, setWidth] = useState(props.width ?? 400)
+  const [height, setHeight] = useState(props.height ?? 600)
+
+  /**
+   * handle form action
+   */
+  function action(formData: FormData) {
+    const widthStr = formData.get("width") as string
+    const heightStr = formData.get("height") as string
+    setWidth(parseInt(widthStr))
+    setHeight(parseInt(heightStr))
+  }
+  const widthInputId = useId()
+  const heightInputId = useId()
+  return (
+    <>
+      <div>
+        <form action={action}>
+          <dl>
+            <dt>
+              <label htmlFor={widthInputId}>
+                {getDomainText('awblog', 'Preview width')}
+              </label>
+            </dt>
+            <dd>
+              <input 
+                id={widthInputId}
+                name="width"
+                type="number"
+                min="100"
+                defaultValue={width} />
+            </dd> 
+            <dt>
+              <label htmlFor={heightInputId}>
+                {getDomainText('awblog', 'Preview height')}
+              </label>
+            </dt>
+            <dd>
+              <input
+                id={heightInputId}
+                name="height"
+                type="number"
+                min="100"
+                defaultValue={height}
+              />
+            </dd>
+          </dl>
+          <button>{getDomainText('awblog', 'Update')}</button>
+        </form>
+      </div>
+      <embed
+        src={
+          props.blob ? URL.createObjectURL(props.blob) : ''
+        }
+        type={props.contentType}
+        width={width}
+        height={height}
+      />
+    </>
+  )
 }
 
 
@@ -110,12 +206,9 @@ export default function BlobPreview(props: BlobPreviewProperties) {
             }
           />
       } else {
-        return <embed
-            src={
-              blob ? URL.createObjectURL(blob) : ''
-            }
-            type={contentResType}
-          />
+        return <Embeded
+                blob={blob} 
+                contentType={contentResType} />
       }
     } else {
       return null
