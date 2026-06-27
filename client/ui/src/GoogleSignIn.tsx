@@ -1,6 +1,5 @@
 import { 
-  useState, useEffect, Suspense, useRef,
-  startTransition
+  useState, useEffect, Suspense, useRef, startTransition
 } from 'react'
 
 import { setOauthToken } from './google-oauth'
@@ -99,6 +98,7 @@ export default function GoogleSignIn(props: GoogleSignInProperties) {
     <Suspense fallback={<p>loading...</p>}>
       <div
         ref={signInRef}
+        className={buttonContainerClass}
         style={
           {
             colorScheme: 'light'
