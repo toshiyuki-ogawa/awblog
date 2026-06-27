@@ -1,6 +1,6 @@
 import { 
   useEffect, startTransition, useRef, useState,
-  useSyncExternalStore, useEffectEvent
+  useSyncExternalStore, useEffectEvent, useImperativeHandle
 } from 'react'
 import * as ace from 'ace-builds'
 import { type DataControl } from './data-control'
@@ -15,6 +15,8 @@ import {
 } from './TextEdit.module.css'
 import { getOauthToken } from './account'
 import { type ContentTypeMng } from './content-type-mng'
+import { type MessageMng } from './message-mng'
+import { getDomainText } from './i18n'
 
 /**
  * editor properties
@@ -51,9 +53,20 @@ type TextEditProperties = {
   contentTypeMng: ContentTypeMng
 
   /**
+   * message management
+   */
+  messageMng: MessageMng
+
+  /**
    * on data contrl attached
    */
   onDataControlAttached?: ((dataConrol: DataControl)=>void)
+
+
+  /**
+   * ref
+   */
+  ref?: React.Ref<DataControl>
 }
 
 /**
@@ -156,8 +169,19 @@ export default function TextEdit(props: TextEditProperties) {
         const content = editor.current.getValue();
 
         (async () => {
-          await updateContentWithStr(
+          const res = await updateContentWithStr(
             props.contentId, content, token)
+          if (res) {
+            const jsonRes = await res.json()
+            if ('OK' == jsonRes['status'])  {
+              props.messageMng.setMessage('')
+            } else {
+              if (jsonRes['message']) {
+                props.messageMng.setMessage(
+                  getDomainText('awblog', jsonRes['message'] ?? '')) 
+              }
+            }
+          }
         })() 
       }
     }
@@ -167,6 +191,11 @@ export default function TextEdit(props: TextEditProperties) {
       props.onDataControlAttached({
         save
       })
+    }
+  })
+  useImperativeHandle(props.ref, ()=> {
+    return {
+      save
     }
   })
   return (

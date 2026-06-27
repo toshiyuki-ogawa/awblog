@@ -17,7 +17,7 @@ import EditAuthorLine from './EditAuthorLine'
 import CommitOption from './CommitOption'
 import TitleAccordion from './TitleAccordion'
 import LinkSelect, { type LinkItem } from './LinkSelect'
-import LazyMessage, { type MessageControl } from './LazyMessage'
+import SimpleMessage from './SimpleMessage'
 import TextEdit from './TextEdit'
 import BinaryEdit from './BinaryEdit'
 import ContentTypeEdit, { type ContentTypeUiControl } from './ContentTypeEdit'
@@ -31,6 +31,7 @@ import { setGotoNext, getGotoNext } from './content-edit-setting'
 import { type DataControl } from './data-control'
 import { getContentTypes } from './content-types'
 import { createContentTypeMng } from './content-type-mng'
+import { createMessageMng, type MessageMng } from './message-mng'
 
 
 /**
@@ -76,7 +77,7 @@ function createLinkItems(): LinkItem[] {
 async function commitContent(
   contentId: number,
   deleteEditing: boolean,
-  messageControl: MessageControl | null = null): Promise<boolean> {
+  messageMng: MessageMng | null = null): Promise<boolean> {
   const author = getAuthor()
   const token = getOauthToken()
   let result = false
@@ -101,12 +102,12 @@ async function commitContent(
     if (succeeded) {
       result = true
     } else {
-      if (messageControl) {
+      if (messageMng) {
         if (message) {
           message = getDomainText('awblog', message)
-          messageControl.setMessage(`${message}`)
+          messageMng.setMessage(`${message}`)
         } else {
-          messageControl.setMessage('')
+          messageMng.setMessage('')
         }
       }
     }
@@ -144,14 +145,14 @@ function selectEditorTypeWithContentType(
  */
 export default function ContentEdit(props: ContentEditProperties) {
 
-  const messageControl = useRef<MessageControl | null>(null)
   const selectId = useId()
   const navigate = useNavigate()
   const textEditControl = useRef<DataControl | null>(null)
   const binaryEditControl = useRef<DataControl | null>(null)
   const contentTypeUiControl = useRef<ContentTypeUiControl  | null>(null)
   const contentTypeMng = createContentTypeMng(props.contentId) 
-
+  const messageMng = createMessageMng()
+  const dataControlRef = useRef<DataControl | null>(null)
 
   useEffect(()=> {
     let doRun = true;
@@ -183,8 +184,8 @@ export default function ContentEdit(props: ContentEditProperties) {
    * save content
    */
   function saveContent() {
-    if (textEditControl.current) {
-      textEditControl.current.save()
+    if (dataControlRef.current) {
+      dataControlRef.current.save()
     }
   } 
 
@@ -202,7 +203,7 @@ export default function ContentEdit(props: ContentEditProperties) {
   async function handleCommitContent() {
     const deleteEditing = isDeleteEditing()
     const res = await commitContent(
-      props.contentId, deleteEditing, messageControl.current)
+      props.contentId, deleteEditing, messageMng)
 
     if (res && deleteEditing) {
       const nextLink = getGotoNext() ?? getBaseIndex()   
@@ -222,13 +223,6 @@ export default function ContentEdit(props: ContentEditProperties) {
   }
 
   /**
-   * handle event about display message
-   */
-  function onReadyToDisplayMessage(control: MessageControl) {
-    messageControl.current = control
-  }
-
-  /**
    * content editor
    */
   function ContentEditor() {
@@ -239,15 +233,19 @@ export default function ContentEdit(props: ContentEditProperties) {
     if (editorType == "text") {
       return (
         <TextEdit
+          messageMng={messageMng}
           contentTypeMng={contentTypeMng}
           onDataControlAttached={onTextEditControlAttached}
+          ref={dataControlRef}
           { ...props }
         />
       )
     } else if (editorType == "binary") {
       return (
         <BinaryEdit
+          messageMng={messageMng}
           contentTypeMng={contentTypeMng}
+          ref={dataControlRef}
           onDataControlAttached={onBinaryEditControlAttached}
           { ...props }
         />
@@ -281,9 +279,10 @@ export default function ContentEdit(props: ContentEditProperties) {
       </TitleAccordion>
       <AccountLine />
       <EditAuthorLine />
-      <LazyMessage onReady={onReadyToDisplayMessage} />
+      <SimpleMessage messageMng={messageMng} />
       <ContentTypeEdit
         contentTypeMng={contentTypeMng}
+        messageMng={messageMng}
         uiControlAttached={contentTypeUiControlAttached}
         /> 
       <ContentEditToolbar

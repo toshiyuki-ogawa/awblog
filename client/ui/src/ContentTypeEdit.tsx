@@ -7,6 +7,7 @@ import { getContentHeader, updateContentHeader } from 'awblog-base'
 import { getOauthToken } from './account'
 import { getContentTypes } from './content-types'
 import { type ContentTypeMng } from './content-type-mng'
+import { type MessageMng } from './message-mng'
 import { getDomainText } from './i18n'
 
 /**
@@ -36,6 +37,11 @@ type ContentTypeEditProperties = {
    * content type management
    */
   contentTypeMng: ContentTypeMng 
+
+  /**
+   * message management
+   */
+  messageMng: MessageMng
 
   /**
    * notified if content type changed
@@ -95,10 +101,14 @@ export default function ContentTypeEdit(
       let updated = false 
       if (res) {
         const jsonRes = await res.json()
-        if (jsonRes['Status'] === 'OK') {
+        if ('OK' == jsonRes['Status']) {
           updated = true
+          props.messageMng.setMessage('')
         } else {
-          // notifiy error message
+          if (jsonRes['message']) {
+            props.messageMng.setMessage(
+              getDomainText('awblog', jsonRes['message'] ?? '')) 
+          }
         }
       }
       if (!updated) {

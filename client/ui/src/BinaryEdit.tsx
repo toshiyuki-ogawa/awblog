@@ -1,5 +1,5 @@
 import { 
-  useState, useRef, useEffect
+  useState, useRef, useEffect, useImperativeHandle
 } from 'react'
 import BlobPreview from './BlobPreview'
 import { getDomainText } from './i18n'
@@ -10,6 +10,7 @@ import { getOauthToken } from './account'
 import mime from 'mime'
 import { type DataControl } from './data-control'
 import { type ContentTypeMng } from './content-type-mng'
+import { type MessageMng } from './message-mng'
 
 /**
  *  binary edit data control
@@ -39,15 +40,19 @@ type BinaryEditProperties = {
   contentTypeMng: ContentTypeMng 
 
   /**
+   * message management
+   */
+  messageMng: MessageMng
+
+  /**
    * on data contrl attached
    */
   onDataControlAttached?: ((dataConrol: DataControl)=>void)
 
-
   /**
-   * content type changed
+   * ref
    */
-  onContentTypeUpdated?: ((contentType: string) => void)
+  ref?: React.Ref<DataControl>
 }
 
 /**
@@ -66,45 +71,86 @@ function nameToType(name: string): string {
   return result
 }
 
+
+/**
+ * update message with json response
+ */
+function updateMessageWithJson(
+  jsonRes: {[key: string]: string},
+  messageMng: MessageMng): boolean {
+  let result = true
+  if ('OK' === jsonRes['status']) {
+    messageMng.setMessage('')
+  } else {
+    result = false
+    if (jsonRes['message']) {
+      messageMng.setMessage(
+        getDomainText('awblog', jsonRes['message'] ?? ''))
+    }
+  }
+  return result
+}
+
+/**
+ * file to content type
+ */
+function fileToContentType(file?: File): string | undefined {
+  let result: string | undefined
+  if (file) {
+    result = file.type
+    if (!result) {
+      result = nameToType(file.name)
+    }
+  }
+  return result
+}
+
 /**
  * update contents and get content
  */
 async function updateContent(
   contentId: number, 
-  file?: File,
-  contentTypeUpdated?: ((type: string)=>void)): Promise<Response | null> {
+  messageMng: MessageMng,
+  file?: File): Promise<Response | null> {
   let result = null
-  if (file) {
 
-    const res = await getContentHeader(
-      contentId, true, getOauthToken() ?? undefined)
-
-    if (res) {
-
-      let contentType = file.type
-      if (!contentType) {
-        contentType = nameToType(file.name)
-      }
+  const res = await getContentHeader(
+    contentId, true, getOauthToken() ?? undefined)
+  if (res) {
+    let succeeded = true
+    let contentHeader: { [key: string]: any } | undefined
+    if (file) {
+      let contentType = fileToContentType(file)!!
       const headerRes = await res.json()
-      const contentHeader = { ...headerRes }
-      contentHeader['content-type'] = contentType
-    
-      let updateRes = await updateContentWithBlob(
-        contentId, file, getOauthToken() ?? undefined)
-      
-      if (updateRes) {
-        updateRes = await updateContentHeader(
-          contentId, contentHeader, getOauthToken() ?? undefined)
-      }
-      if (updateRes) {
-        if (contentTypeUpdated) {
-          contentTypeUpdated(contentType)
-        }
-        result = await getContent(
-          contentId, true, getOauthToken() ?? undefined)
+      contentHeader = { ...headerRes }
+      if (Object.is((contentHeader!!)['content-type'], contentType)) {
+        (contentHeader!!)['content-type'] = contentType
       }
     }
-  } 
+    
+    let updateRes = await updateContentWithBlob(
+      contentId, file ?? new Blob(), getOauthToken() ?? undefined)
+    if (updateRes) {
+      succeeded = updateMessageWithJson(await updateRes.json(), messageMng)
+    } else {
+      succeeded = false
+    }
+    if (succeeded) {
+      if (contentHeader) {
+        updateRes = await updateContentHeader(
+          contentId, contentHeader, getOauthToken() ?? undefined)
+        if (updateRes) {
+          succeeded = updateMessageWithJson(await updateRes.json(), messageMng)
+        } else {
+          succeeded = false
+        }
+      }
+    }
+    if (succeeded) {
+      result = await getContent(
+        contentId, true, getOauthToken() ?? undefined)
+    }
+  }
   return result
 }
 
@@ -138,20 +184,9 @@ export default function BinaryEdit(
       if (submitType == "file") {
         if (files.length) {
           setFile(files[0])
-          
-        } else {
-          setFile(undefined)
         }
       } else {
-        if (files.length) {
-          setBlobResponse(
-            await updateContent(
-              props.contentId, files[0], props.onContentTypeUpdated))
-        } else {
-          setBlobResponse(
-            await updateContent(
-              props.contentId, undefined, props.onContentTypeUpdated))
-        }
+        setFile(undefined) 
       }
     }
   }
@@ -161,17 +196,14 @@ export default function BinaryEdit(
    */
   function save() {
     (async () => {
-      if (imgInputElement.current) {
-        const files = imgInputElement.current.files as FileList
-         if (files.length) {
-          setBlobResponse(
-            await updateContent(
-              props.contentId, files[0], props.onContentTypeUpdated))
-        } else {
-          setBlobResponse(
-            await updateContent(
-              props.contentId, undefined, props.onContentTypeUpdated))
-        }
+      if (file) {
+        setBlobResponse(
+          await updateContent(
+            props.contentId, props.messageMng, file))
+      } else {
+        setBlobResponse(
+          await updateContent(
+            props.contentId, props.messageMng, undefined))
       }
     })()
   }
@@ -192,7 +224,12 @@ export default function BinaryEdit(
       })
     }
   })
-
+  useImperativeHandle(props.ref, ()=> {
+    return {
+      save
+    }
+  })
+ 
   return (
     <>
       <div>
@@ -205,12 +242,17 @@ export default function BinaryEdit(
           <button name="update" value="file" >
             {getDomainText('awblog', 'Update')}
           </button>
+          <button name="update" value="clear">
+            {getDomainText('awblog', 'Clear')}
+          </button>
         </form>
       </div>
       <div>
         <BlobPreview
           contentResponse={blobResponse ?? undefined}
-          blob={file}/>
+          blob={file}
+          contentType={file ? fileToContentType(file) : undefined}
+          />
       </div>
     </>
   )

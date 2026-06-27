@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import mime from 'mime'
 
 /**
@@ -48,17 +48,18 @@ function isImageType(contentType: string): boolean {
 export default function BlobPreview(props: BlobPreviewProperties) {
 
   const [blob, setBlob] = useState<Blob | null>(null)
-  const [contentResType, setContentResType] = useState<string>(
-    props.contentType ?? '')
-
-  useEffect(()=> {
-    let doRun = true
-    if (!contentResType) {
-      if (blob && doRun) {
-        if (blob.type) {
-          setContentResType(blob.type)
+  const contentResType = useMemo(()=> {
+    let result = props.contentType ?? ''
+    if (!result) {
+      if (props.contentResponse) {
+        if (props.contentResponse.headers.get('Content-Type')) {
+          result = props.contentResponse.headers.get('Content-Type') ?? ''
+        }
+      } else if (props.blob) {
+        if (props.blob.type) {
+          result = props.blob.type
         } else {
-          const fileBlob = blob as File
+          const fileBlob = props.blob as File
           if (fileBlob.name) {
             const fileName = fileBlob.name
             const idx = fileName.lastIndexOf('.')
@@ -66,18 +67,15 @@ export default function BlobPreview(props: BlobPreviewProperties) {
               const ext = fileName.slice(idx + 1)
               const mimeType = mime.getType(ext) 
               if (mimeType) {
-                setContentResType(mimeType as string)
+                result = mimeType as string
               }
             }
           }
-        }
+        } 
       }
-    }
-    return () =>{
-      doRun = false
-    }
-
-  }, [blob])
+    } 
+    return result
+  }, [props.contentType, props.contentResponse, props.blob])
 
   useEffect(()=> {
     let doRun = true
@@ -85,13 +83,6 @@ export default function BlobPreview(props: BlobPreviewProperties) {
     if (props.contentResponse) {
       (async ()=> {
         if (doRun) {
-          let contentType = ''
-          if (!contentType) {
-            if ((props.contentResponse!!).headers.get('Content-Type')) {
-              setContentResType(
-                (props.contentResponse!!).headers.get('Content-Type') ?? '')
-            }
-          }
           setBlob(await (props.contentResponse!!).blob() ?? null)
         }
       })()
@@ -99,8 +90,11 @@ export default function BlobPreview(props: BlobPreviewProperties) {
       if (doRun) {
         setBlob(props.blob)
       }
+    } else {
+      if (doRun) {
+        setBlob(null)
+      }
     }
-
     return () => {
       doRun = false
     }
