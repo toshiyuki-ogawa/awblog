@@ -1,8 +1,6 @@
 
-.itemContainer {
+.commandContainer {
   display: block flex;
-  gap: .5em;
-  margin-left: 1em;
+  gap: .5em; 
 }
-
 /* vi: se ts=2 sw=2 et: */

@@ -9,7 +9,10 @@ import {
   commit
 } from 'awblog-base'
 import { 
-  editor as editorClass
+  saveCommitToolbar as saveCommitToolbarClass,
+  optionTitle as optionTitleClass,
+  editor as editorClass,
+  binaryEditEmbedControl as binaryEditEmbedControlClass
 } from './ContentEdit.module.css'
 import ContentEditToolbar from './ContentEditToolbar'
 import AccountLine from './AccountLine'
@@ -230,6 +233,7 @@ export default function ContentEdit(props: ContentEditProperties) {
           messageMng={messageMng}
           contentTypeMng={contentTypeMng}
           ref={dataControlRef}
+          embedControlClassName={binaryEditEmbedControlClass}
           { ...props }
         />
       )
@@ -261,6 +265,10 @@ export default function ContentEdit(props: ContentEditProperties) {
     <>
       <TitleAccordion
         title={getDomainText('awblog', 'Save and commit option')}>
+        <h1
+          className={optionTitleClass}>
+          {getDomainText('awblog', 'Commit')}
+        </h1>
         <CommitOption />
         <div>
           <div>
@@ -277,8 +285,15 @@ export default function ContentEdit(props: ContentEditProperties) {
             links={createLinkItems()}
             onSelect={handleLinkChanged}
             defaultValue={getGotoNext() ?? getBaseIndex() } />
-
+          <h1
+            className={optionTitleClass}>
+            {getDomainText('awblog', 'Account')}
+          </h1>
           <AccountMng />
+          <h1
+            className={optionTitleClass}>
+            {getDomainText('awblog', 'Author')}
+          </h1>
           <EditAuthorList />
         </div>
       </TitleAccordion>
@@ -286,7 +301,8 @@ export default function ContentEdit(props: ContentEditProperties) {
       <SimpleMessage messageMng={messageMng} />
       <ContentEditToolbar
         saveAction={saveContent}
-        commitAction={handleCommitContent} />
+        commitAction={handleCommitContent}
+        className={saveCommitToolbarClass}/>
       <Suspense fallback={<p>loading...</p>}>
         <ContentEditor />
       </Suspense>

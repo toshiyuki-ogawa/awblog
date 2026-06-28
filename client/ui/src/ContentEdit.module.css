@@ -1,4 +1,12 @@
 
+.saveCommitToolbar {
+  margin-top: .5em;
+}
+
+.optionTitle {
+  font-size: 1em;
+}
+
 .messageBox {
   color: red;
 }
@@ -6,6 +14,10 @@
 .editor {
   width: 100%;
   height: 100%;
+}
+
+.binaryEditEmbedControl {
+  margin-left: 1em;
 }
 
 

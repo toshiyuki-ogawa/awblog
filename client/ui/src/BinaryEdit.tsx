@@ -12,6 +12,10 @@ import { type DataControl } from './data-control'
 import { type ContentTypeMng } from './content-type-mng'
 import { type MessageMng } from './message-mng'
 import { getContentTypes } from './content-types'
+import {
+  imageSourceControlContainer as imageSourceControlContainerClass,
+  commandContainer as commandContainerClass
+} from './BinaryEdit.module.css'
 
 /**
  *  binary edit data control
@@ -44,6 +48,11 @@ type BinaryEditProperties = {
    * message management
    */
   messageMng: MessageMng
+
+  /**
+   * embed control class name
+   */
+  embedControlClassName?: string
 
   /**
    * ref
@@ -239,7 +248,8 @@ export default function BinaryEdit(
  
   return (
     <>
-      <div>
+      <div
+        className={imageSourceControlContainerClass}>
         <form action={action} >
           <dl>
             <dt>
@@ -258,17 +268,21 @@ export default function BinaryEdit(
                 />
             </dd>
           </dl>
-          <button name="update" value="file" >
-            {getDomainText('awblog', 'Update')}
-          </button>
-          <button name="update" value="clear">
-            {getDomainText('awblog', 'Clear')}
-          </button>
+          <div
+            className={commandContainerClass} >
+            <button name="update" value="file" >
+              {getDomainText('awblog', 'Update')}
+            </button>
+            <button name="update" value="clear">
+              {getDomainText('awblog', 'Clear')}
+            </button>
+          </div>
         </form>
       </div>
       <div>
         <BlobPreview
           contentResponse={blobResponse ?? undefined}
+          embedControlClassName={props.embedControlClassName}
           blob={file}
           contentType={file ? fileToContentType(file) : undefined}
           />

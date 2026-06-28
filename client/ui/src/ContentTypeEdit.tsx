@@ -9,6 +9,9 @@ import { getContentTypes } from './content-types'
 import { type ContentTypeMng } from './content-type-mng'
 import { type MessageMng } from './message-mng'
 import { getDomainText } from './i18n'
+import {
+  commandContainer as commandContainerClass
+} from './ContentTypeEdit.module.css'
 
 /**
  * content type ui control
@@ -138,16 +141,19 @@ export default function ContentTypeEdit(
               />
           </dd>
         </dl>
-        <button name="modify" value="save">
-          {
-            getDomainText('awblog', 'Save')
-          }
-        </button>
-        <button name="modify" value="load">
-          {
-            getDomainText('awblog', 'Load')
-          }
-        </button>
+        <div
+          className={commandContainerClass}>
+          <button name="modify" value="save">
+            {
+              getDomainText('awblog', 'Save')
+            }
+          </button>
+          <button name="modify" value="load">
+            {
+              getDomainText('awblog', 'Load')
+            }
+          </button>
+        </div>
         <datalist id={itemsId}>
           {
             getContentTypes().map(item => <option value={item[0]} />)

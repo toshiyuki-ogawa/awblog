@@ -18,6 +18,11 @@ type EditToolbarProperties = {
    * handle commit
    */
   commitAction?: (()=>void)
+
+  /**
+   * class name
+   */
+  className?: string
 }
 
 
@@ -50,9 +55,13 @@ export default function ContentEditToolbar(
       props.commitAction()
     }
   }
+  const toolbarClasses = [itemContainerClass]
+  if (props.className) {
+    toolbarClasses.push(props.className)
+  }
 
   return (
-    <div className={itemContainerClass}>
+    <div className={toolbarClasses.join(' ')}>
       <form action={saveAction}>
         <button>
           {getDomainText('awblog', 'Save')}

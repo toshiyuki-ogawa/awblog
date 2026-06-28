@@ -1,11 +1,14 @@
 import { useEffect, useState, useMemo, useId } from 'react'
 import mime from 'mime'
 import { getDomainText } from './i18n'
+import {
+  embedCommandContainer as embedCommandContainerClass
+} from './BlobPreview.module.css'
 
 /**
- * embeded component properties
+ * embed component properties
  */
-type EmbededProperties = {
+type EmbedProperties = {
 
   /**
    * content data
@@ -27,6 +30,11 @@ type EmbededProperties = {
    * initial height
    */
   height?: number
+
+  /**
+   * embed control class name
+   */
+  embedControlClassName?: string
 }
 
 /**
@@ -47,6 +55,11 @@ type BlobPreviewProperties = {
    * direct content type
    */
   contentType?: string
+
+  /**
+   * embed control class name:
+   */
+  embedControlClassName?: string
 }
 
 
@@ -71,9 +84,9 @@ function isImageType(contentType: string): boolean {
 
 
 /**
- * embeded properties
+ * embed properties
  */
-function Embeded(props: EmbededProperties) {
+function Embed(props: EmbedProperties) {
 
   const [width, setWidth] = useState(props.width ?? 400)
   const [height, setHeight] = useState(props.height ?? 600)
@@ -91,7 +104,8 @@ function Embeded(props: EmbededProperties) {
   const heightInputId = useId()
   return (
     <>
-      <div>
+      <div
+        className={props.embedControlClassName}>
         <form action={action}>
           <dl>
             <dt>
@@ -122,7 +136,10 @@ function Embeded(props: EmbededProperties) {
               />
             </dd>
           </dl>
-          <button>{getDomainText('awblog', 'Update')}</button>
+          <div
+            className={embedCommandContainerClass}>
+            <button>{getDomainText('awblog', 'Update')}</button>
+          </div>
         </form>
       </div>
       <embed
@@ -206,7 +223,8 @@ export default function BlobPreview(props: BlobPreviewProperties) {
             }
           />
       } else {
-        return <Embeded
+        return <Embed
+                embedControlClassName={props.embedControlClassName}
                 blob={blob} 
                 contentType={contentResType} />
       }
