@@ -11,6 +11,7 @@ import mime from 'mime'
 import { type DataControl } from './data-control'
 import { type ContentTypeMng } from './content-type-mng'
 import { type MessageMng } from './message-mng'
+import { getContentTypes } from './content-types'
 
 /**
  *  binary edit data control
@@ -43,11 +44,6 @@ type BinaryEditProperties = {
    * message management
    */
   messageMng: MessageMng
-
-  /**
-   * on data contrl attached
-   */
-  onDataControlAttached?: ((dataConrol: DataControl)=>void)
 
   /**
    * ref
@@ -162,6 +158,23 @@ export function isBinaryEditType(contentType: string): boolean {
     || contentType.indexOf("application/pdf") !== -1
 }
 
+/**
+ * create accept listt
+ */
+function createAcceptList(): string[] {
+  return getContentTypes()
+    .filter(item => {
+      let accept = false
+      accept = item[0].indexOf("image") == 0
+      if (!accept && item.length > 2) {
+        accept = item[2].indexOf("image") != -1
+      }
+      return accept
+    })
+    .map(item => item[0])
+    
+}
+
 
 /**
  * header edit
@@ -217,13 +230,6 @@ export default function BinaryEdit(
     }
   }, [file])
 
-  useEffect(()=> {
-    if (props.onDataControlAttached) {
-      props.onDataControlAttached({
-        save
-      })
-    }
-  })
   useImperativeHandle(props.ref, ()=> {
     return {
       save
@@ -236,7 +242,8 @@ export default function BinaryEdit(
         <form action={action} >
           <label>{getDomainText('awblog', 'Image source')}
             <input name="img"
-              type="file" accept="image/*,.pdf"
+              type="file" 
+              accept={createAcceptList().join(",")}
               ref={imgInputElement}/>
           </label>
           <button name="update" value="file" >

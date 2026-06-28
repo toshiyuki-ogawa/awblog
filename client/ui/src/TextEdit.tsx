@@ -1,6 +1,7 @@
 import { 
   useEffect, startTransition, useRef, useState,
-  useSyncExternalStore, useEffectEvent, useImperativeHandle
+  useSyncExternalStore, useEffectEvent, useImperativeHandle,
+  useId
 } from 'react'
 import * as ace from 'ace-builds'
 import { type DataControl } from './data-control'
@@ -38,6 +39,18 @@ type EditorProperties = {
   onEditorAttached?: ((editor: ace.Editor)=>void) 
 }
 
+
+/**
+ * updater with file properties
+ */
+type UpdaterWithFileProperties = {
+
+  /**
+   * called when text loaded
+   */
+  onTextLoad: (text: string) => void
+}
+
 /**
  * text edit properties
  */
@@ -58,16 +71,60 @@ type TextEditProperties = {
   messageMng: MessageMng
 
   /**
-   * on data contrl attached
-   */
-  onDataControlAttached?: ((dataConrol: DataControl)=>void)
-
-
-  /**
    * ref
    */
   ref?: React.Ref<DataControl>
 }
+
+/**
+ * update text content with user selected file.
+ */
+function UpdaterWithFile(props: UpdaterWithFileProperties) {
+
+  const dataInputElement = useRef<HTMLInputElement | null>(null)
+
+  /**
+   * handle form action
+   */
+  function action(formData: FormData) {
+    if (dataInputElement.current) {
+      const files = dataInputElement.current.files as FileList
+      if (files.length) {
+        (async ()=> {
+          const file = files[0]
+          props.onTextLoad(await file.text())
+        })()
+      }
+    }
+  }
+
+  const textInputId = useId()
+  return (
+    <div>
+      <form action={action}>
+        <dl>
+          <dt>
+            <label htmlFor={textInputId}>
+              {getDomainText('awblog', 'Text source')}
+            </label>
+          </dt>
+          <dd>
+            <input
+              id={textInputId}
+              name="text-data"
+              type="file"
+              accept=".txt,.md,htm,.html,.css,.mjs,.js,.json"
+              ref={dataInputElement}/>
+          </dd>
+        </dl> 
+        <button>
+          {getDomainText('awblog', 'Update')}
+        </button>
+      </form>
+    </div>
+  )
+}
+
 
 /**
  * editor
@@ -160,6 +217,14 @@ export default function TextEdit(props: TextEditProperties) {
     editor.current = aceEditor
   }
   /**
+   * handle text load event
+   */
+  function onTextLoad(text: string) {
+    if (editor.current) {
+      editor.current.setValue(text)
+    }
+  }
+  /**
    * save content
    */
   function save() {
@@ -186,22 +251,22 @@ export default function TextEdit(props: TextEditProperties) {
       }
     }
   } 
-  useEffect(()=> {
-    if (props.onDataControlAttached) {
-      props.onDataControlAttached({
-        save
-      })
-    }
-  })
+
   useImperativeHandle(props.ref, ()=> {
     return {
       save
     }
   })
+
   return (
-    <Editor 
-      onEditorAttached={onEditorAttached}
-      { ...props } />
+    <>
+      <UpdaterWithFile 
+        onTextLoad = {onTextLoad} 
+      />
+      <Editor 
+        onEditorAttached={onEditorAttached}
+        { ...props } />
+    </>
   )
 }
 // vi: se ts=2 sw=2 et:
