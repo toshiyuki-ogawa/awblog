@@ -1,5 +1,5 @@
 import { 
-  useState, useRef, useEffect, useImperativeHandle
+  useState, useRef, useEffect, useImperativeHandle, useId
 } from 'react'
 import BlobPreview from './BlobPreview'
 import { getDomainText } from './i18n'
@@ -235,17 +235,29 @@ export default function BinaryEdit(
       save
     }
   })
+  const imgInputId = useId()
  
   return (
     <>
       <div>
         <form action={action} >
-          <label>{getDomainText('awblog', 'Image source')}
-            <input name="img"
-              type="file" 
-              accept={createAcceptList().join(",")}
-              ref={imgInputElement}/>
-          </label>
+          <dl>
+            <dt>
+              <label
+                htmlFor={imgInputId}>
+                {getDomainText('awblog', 'Image source')}
+              </label>
+            </dt>
+            <dd>
+              <input
+                name="img"
+                type="file" 
+                accept={createAcceptList().join(",")}
+                ref={imgInputElement}
+                id={imgInputId}
+                />
+            </dd>
+          </dl>
           <button name="update" value="file" >
             {getDomainText('awblog', 'Update')}
           </button>
