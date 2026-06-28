@@ -11,12 +11,9 @@ let contentTypes: string[][] = []
 export async function loadContentTypes() {
 
   try {
-    const res = await fetch('content-types.txt')
+    const res = await fetch('content-types.json')
     if (res.ok) {
-      contentTypes = (await res.text()).split("\n")
-        .map(item => item.trim())
-        .filter(item => item.length)
-        .map(item => item.split(",").map(item => item.trim()))
+      contentTypes = (await res.json()) as string[][]
     }
   } catch(e) {
     console.error(e)

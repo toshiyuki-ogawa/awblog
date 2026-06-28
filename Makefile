@@ -65,10 +65,10 @@ deploy-index-entries-json: docroot/index-entries.json
 
 .PHONY: deploy-index-entries-json
 
-docroot/content-types.txt: client/ui/content-types.txt
+docroot/content-types.json: client/ui/content-types.json
 	cp $< $@
 
-deploy-content-types: docroot/content-types.txt
+deploy-content-types: docroot/content-types.json
 
 
 .PHONY: deploy-content-types
