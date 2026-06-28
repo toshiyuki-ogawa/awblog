@@ -9,5 +9,6 @@ text/html
 text/javascript
 text/markdown
 text/plain
-application/pdf
-applicaiton/json
+text/css
+application/pdf,,image
+applicaiton/json,,text

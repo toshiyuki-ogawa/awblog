@@ -13,7 +13,8 @@ import {
 } from './ContentEdit.module.css'
 import ContentEditToolbar from './ContentEditToolbar'
 import AccountLine from './AccountLine'
-import EditAuthorLine from './EditAuthorLine'
+import AccountMng from './AccountMng'
+import { EditAuthorList } from './EditAuthor'
 import CommitOption from './CommitOption'
 import TitleAccordion from './TitleAccordion'
 import LinkSelect, { type LinkItem } from './LinkSelect'
@@ -147,8 +148,6 @@ export default function ContentEdit(props: ContentEditProperties) {
 
   const selectId = useId()
   const navigate = useNavigate()
-  const textEditControl = useRef<DataControl | null>(null)
-  const binaryEditControl = useRef<DataControl | null>(null)
   const contentTypeUiControl = useRef<ContentTypeUiControl  | null>(null)
   const contentTypeMng = createContentTypeMng(props.contentId) 
   const messageMng = createMessageMng()
@@ -165,20 +164,6 @@ export default function ContentEdit(props: ContentEditProperties) {
       doRun = false
     }
   }, [props.contentId])
-
-  /**
-   * handle text edit data control attached event
-   */
-  function onTextEditControlAttached(dataControl: DataControl) {
-    textEditControl.current = dataControl
-  }
-
-  /**
-   * handle binary edit data control attached event
-   */
-  function onBinaryEditControlAttached(dataControl: DataControl) {
-    binaryEditControl.current = dataControl
-  }
 
   /**
    * save content
@@ -235,7 +220,6 @@ export default function ContentEdit(props: ContentEditProperties) {
         <TextEdit
           messageMng={messageMng}
           contentTypeMng={contentTypeMng}
-          onDataControlAttached={onTextEditControlAttached}
           ref={dataControlRef}
           { ...props }
         />
@@ -246,7 +230,6 @@ export default function ContentEdit(props: ContentEditProperties) {
           messageMng={messageMng}
           contentTypeMng={contentTypeMng}
           ref={dataControlRef}
-          onDataControlAttached={onBinaryEditControlAttached}
           { ...props }
         />
       )
@@ -254,11 +237,30 @@ export default function ContentEdit(props: ContentEditProperties) {
       return null
     }
   }
+  function ContentTypeLine() {
+    const contentType = useSyncExternalStore(
+      contentTypeMng.subscribe, contentTypeMng.getContentType)
+
+    return (
+      <TitleAccordion
+        title={
+          getDomainText(
+            'awblog',
+            `Content type: ${contentType}`)
+        } >
+        <ContentTypeEdit
+          contentTypeMng={contentTypeMng}
+          messageMng={messageMng}
+          uiControlAttached={contentTypeUiControlAttached}
+          /> 
+      </TitleAccordion>
+    )
+  }
 
   return (
     <>
       <TitleAccordion
-        title={getDomainText('awblog', 'Commit option')}>
+        title={getDomainText('awblog', 'Save and commit option')}>
         <CommitOption />
         <div>
           <div>
@@ -275,16 +277,13 @@ export default function ContentEdit(props: ContentEditProperties) {
             links={createLinkItems()}
             onSelect={handleLinkChanged}
             defaultValue={getGotoNext() ?? getBaseIndex() } />
+
+          <AccountMng />
+          <EditAuthorList />
         </div>
       </TitleAccordion>
-      <AccountLine />
-      <EditAuthorLine />
+      <ContentTypeLine />
       <SimpleMessage messageMng={messageMng} />
-      <ContentTypeEdit
-        contentTypeMng={contentTypeMng}
-        messageMng={messageMng}
-        uiControlAttached={contentTypeUiControlAttached}
-        /> 
       <ContentEditToolbar
         saveAction={saveContent}
         commitAction={handleCommitContent} />

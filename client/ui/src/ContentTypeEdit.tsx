@@ -86,6 +86,7 @@ export default function ContentTypeEdit(
 
   const contentTypeRef = useRef<HTMLInputElement | null>(null)
   const itemsId = useId()
+  const contentTypeInputId = useId()
   const contentType = useSyncExternalStore(
     props.contentTypeMng.subscribe, props.contentTypeMng.getContentType)
 
@@ -121,11 +122,22 @@ export default function ContentTypeEdit(
   return (
     <>
       <form action={action}> 
-        <input
-          name="content-type"
-          defaultValue={contentType} 
-          list={itemsId}
-          />
+        <dl>
+          <dt>
+            <label
+              htmlFor={contentTypeInputId}>
+              {getDomainText('awblog', 'Content type')}
+            </label>
+          </dt>
+          <dd>
+            <input
+              id={contentTypeInputId}
+              name="content-type"
+              defaultValue={contentType} 
+              list={itemsId}
+              />
+          </dd>
+        </dl>
         <button name="modify" value="save">
           {
             getDomainText('awblog', 'Save')
