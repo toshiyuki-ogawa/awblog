@@ -8,6 +8,9 @@ import loadDataFromStorage from './storage'
 import { init as initAccount } from './account'
 import { loadEntryTitle } from './entry-title'
 import { loadIndexEntries } from './index-entries'
+import {
+  initAccountLibrary as initGoogleAccountLib
+} from './oauth-token-google'
 
 // start application
 (async () => {
@@ -34,8 +37,10 @@ import { loadIndexEntries } from './index-entries'
   await loadEntryTitle()
   await loadIndexEntries("index.html")
   await loadContentTypes() 
+  await initGoogleAccountLib()
   loadDataFromStorage()
   initAccount()
+
   createRoot(document.getElementById('main')!).render(
     <BrowserRouter basename={basename} >
       <AppRoutes />
