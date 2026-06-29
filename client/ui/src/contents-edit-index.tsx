@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
-import AppRoutes from './AppRoutes'
+import ContentEditAppRoutes from './ContentsEditAppRoutes'
 import { init as initAwblog }  from 'awblog-base'
 import { loadI18nSetting } from './i18n'
 import { loadContentTypes } from './content-types'
@@ -35,7 +35,7 @@ import {
   const succeeded = await loadI18nSetting(basename)
   await initAwblog()
   await loadEntryTitle()
-  await loadIndexEntries("index.html")
+  await loadIndexEntries("contents-edit-index.html")
   await loadContentTypes() 
   await initGoogleAccountLib()
   loadDataFromStorage()
@@ -43,7 +43,7 @@ import {
 
   createRoot(document.getElementById('main')!).render(
     <BrowserRouter basename={basename} >
-      <AppRoutes />
+      <ContentEditAppRoutes />
     </BrowserRouter>
   )
 })()

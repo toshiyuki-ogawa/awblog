@@ -10,13 +10,13 @@ import SignInPage from './SignInPage'
 /**
  * awblog application 
  */
-export default function AppRoutes() {
+export default function ContentsEditAppRoutes() {
 
   return (
     <>
       <Routes>
         <Route index element={<App />}/>
-        <Route path="index.html" element={<App />} />
+        <Route path="contents-edit-index.html" element={<App />} />
         <Route path="contents-mng.html" element={<Contents />} />
         <Route path="public.html" element={<PublicPage />}/>
         <Route path="page-mng.html" element={<MngPage />} />
