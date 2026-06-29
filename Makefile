@@ -108,6 +108,9 @@ deploy-ui: client-ui-dist \
 	cp client/ui/dist/*.js* docroot/assets
 	cp client/ui/contents-edit-index.css docroot
 	cp client/ui/contents-edit-index.html docroot
+	cp client/ui/index.css docroot
+	cp client/ui/index.html docroot
+
 
 .PHONY: deploy-ui
 

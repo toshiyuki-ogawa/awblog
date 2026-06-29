@@ -10,7 +10,9 @@ lint:
 
 .PHONY: lint
 
-index-entries.json: index-entries.txt
-	npm run make-index-map >$@
+index-entries-json: 
+	npm run make-index-map >index-entries.json
+
+.PHONY: index-entries-json
 
 # vi: se ts=4 sw=4 noet:

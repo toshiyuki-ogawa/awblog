@@ -30,7 +30,7 @@ ui-lint:
 .PHONY: ui-lint
 
 ui-index-entries-json:
-	$(MAKE) -C ui index-entries.json
+	$(MAKE) -C ui index-entries-json
 
 .PHONY: ui-index-entries-json
 

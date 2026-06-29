@@ -1,10 +1,7 @@
 {
   "contents-edit-index.html": [
-    "contents-edit-index.html",
     "contents-mng.html",
     "public.html",
-    "page-mng.html",
-    "edit-author.html",
-    "signin.html"
+    "page-mng.html"
   ]
 }
