@@ -38,9 +38,12 @@ class AccessCtrl:
     def setup_dispatcher(self):
         """ init handler """
         self.handler = {
+            'create-content': self.create_content,
             'edit-content': self.edit_content,
             'update-content': self.update_content,
             'update-header': self.update_header,
+            'get-content': self.get_content,
+            'get-header': self.get_header,
             'commit': self.commit
         }
     def load_setting(self):
@@ -126,16 +129,25 @@ class AccessCtrl:
                     token)
         return result
 
+    def create_content(self, environ: dict, param: dict):
+        """ access control for create content action """
+        return self.allow_request_contains_editor(environ)
+ 
     def edit_content(self, environ: dict, param: dict):
         """ access control for edit action """
-        return True
-
+        return self.allow_request_contains_editor(environ)
     def update_content(self, environ: dict, param: dict):
         """ access control for update content action """
         return self.allow_request_contains_editor(environ)
     def update_header(self, environ: dict, param: dict):
         """ access control for update header action """
         return self.allow_request_contains_editor(environ)
+    def get_content(self, environ: dict, param: dict):
+        """ access control for get content action """
+        return True
+    def get_header(self, environ: dict, param: dict):
+        """ access control for get header action """
+        return True
 
     def commit(self, environ: dict, param: dict):
         """ access control for commit action """

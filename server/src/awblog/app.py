@@ -9,6 +9,7 @@ import sys
 import traceback
 import urllib.parse
 import email.utils
+import flock
 
 from .accessctrl import AccessCtrl
 
@@ -189,10 +190,52 @@ class App:
         return result
     def edit_content(self, environ, start_response, params: dict):
         """ create content for editing """
-        start_response(
-            f"{http.HTTPStatus.OK} {http.HTTPStatus.OK.phrase}",
-            [("Content-Type", "text/plain")])
-        yield "run edit content\n".encode()
+        if self.access_ctrl.allow_access(environ, params):
+            result = []
+            content_id = self.get_content_id(params)
+            try:
+                if content_id is not None:
+                    with open(__file__) as fp:
+                        flock.acquire_lock(fp)
+                        content_exists = self.dtrack_app.content_editing_exists(
+                            content_id)
+                        if not content_exists: 
+                            self.dtrack_app.create_edit_content_from_id(
+                                content_id)
+                            res = {
+                                "status": "OK"
+                            }
+                        else:
+                            res = {
+                                "status": "OK",
+                                "message": "Content is editing"
+                            }
+                        flock.release_lock(fp)
+                    writer = self.set_response(
+                            start_response,
+                            http.HTTPStatus.OK,
+                            http.HTTPStatus.OK.phrase,
+                            [("Content-Type", "application/json")])
+                    writer(json.dumps(res).encode()) 
+                else:
+                    self.response_access_denied(start_response, 'No content id')
+            except:
+                log.Log.print_log_warn_into_stream(
+                        environ['wsgi.errors'],
+                        repr(sys.exception()))
+                log.Log.print_log_warn_into_stream(
+                        environ['wsgi.errors'],
+                        traceback.format_exc())
+                self.set_response(
+                        start_response,
+                        http.HTTPStatus.INTERNAL_SERVER_ERROR,
+                        http.HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
+                        [])
+        else:
+            self.response_access_denied(start_response, 
+                    'Not allow to edit content')
+             
+        return []
         
     def update_content(self, environ, start_response, params: dict):
         """ update content """
@@ -455,8 +498,13 @@ class App:
                     if author and email_addr:
                         delete_editing = 'delete' in params
                         content_header = None
-                        self.dtrack_app.commit(
-                            content_id, delete_editing, author, email_addr)
+                        with open(__file__) as fp:
+                            flock.acquire_lock(fp)
+                            self.dtrack_app.commit(
+                                content_id, delete_editing, author, email_addr)
+                            flock.release_lock(fp)
+
+
                         writer = self.set_response(
                                 start_response,
                                 http.HTTPStatus.OK,
