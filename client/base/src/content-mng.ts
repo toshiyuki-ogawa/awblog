@@ -312,6 +312,35 @@ export async function listCommit(
 }
 
 /**
+ * start to edit content 
+ */
+export async function editContent(
+  contentId: number,
+  accessToken?: string): Promise<Response | null> {
+  let result = null 
+  const requestPath = getRequestPath()
+  if (requestPath) {
+    const headers = new Headers()
+    if (accessToken) {
+      headers.append('Authorization', `Bearer ${accessToken}`)
+    }
+    const searchParams = new URLSearchParams()
+    searchParams.append('action', 'edit-content')
+    searchParams.append('content-id', contentId.toString())
+    const fetchOptions: RequestInit = {
+      method: 'POST',
+      headers
+    }
+    const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
+    if (res.ok && isOkResponse(res.headers)) {
+      result = res
+    }
+  }
+  return result
+}
+
+
+/**
  * get editing status about content id 
  */
 export async function isEditing(
