@@ -6,18 +6,19 @@ import PublicPage from './PublicPage'
 import MngPage from './MngPage'
 import EditAuthorPage from './EditAuthorPage'
 import SignInPage from './SignInPage'
+import StartEditingPage from './StartEditingPage'
 
 /**
  * awblog application 
  */
 export default function ContentsEditAppRoutes() {
-
   return (
     <>
       <Routes>
         <Route path="contents-mng.html" element={<Contents />} />
         <Route path="public.html" element={<PublicPage />}/>
         <Route path="page-mng.html" element={<MngPage />} />
+        <Route path="start-editing.html" element={<StartEditingPage />} />
       </Routes>
     </>
   )

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { Link } from 'react-router'
 import {
   listContent,
   type CommitItem,
@@ -8,6 +9,7 @@ import {
 import { getDomainText } from './i18n'
 
 import ContentPreview from './ContentPreview'
+import { getBasename } from './basename'
 
 /**
  * content list properties
@@ -129,8 +131,8 @@ function contentItemsToConentAttrs(
     idAttrs.set(contentId, {
       contentId,
       oid: item.oid,
-      release: contentId in releaseIds,
-      editing: contentId in editingIds,
+      release: releaseIds.has(contentId),
+      editing: editingIds.has(contentId),
     })
   })
   
@@ -140,7 +142,7 @@ function contentItemsToConentAttrs(
     idAttrs.set(contentId, {
       contentId,
       release: true,
-      editing: contentId in editingIds 
+      editing: editingIds.has(contentId)
     })
   })
   const restEditingIds = editingIds.difference(processedIds)
@@ -156,6 +158,40 @@ function contentItemsToConentAttrs(
     .keys().toArray().sort().map(id => idAttrs.get(id)!!)
 
   return result
+}
+
+
+/**
+ * create opration for content
+ */
+function ItemOpration(props: { item: ContentAttr} ) {
+  const messageToEdit = getDomainText('awblog', 'Edit')
+  const searchParams = new URLSearchParams()
+  searchParams.set('content-id', props.item.contentId.toString())
+  searchParams.set('auto-start', true.toString())
+  if (props.item.editing) {
+    return (
+      <Link to={
+        {
+          pathname: `${getBasename()}page-mng.html`,
+          search: `?${searchParams.toString()}`
+        }
+      }>
+      {getDomainText('awblog', 'Edit')}
+      </Link>
+    )
+  } else {
+    return(
+      <Link to={
+        {
+          pathname: `${getBasename()}start-editing.html`,
+          search: `?${searchParams.toString()}`
+        }
+      }>
+      {getDomainText('awblog', 'Edit')}
+      </Link>
+    )
+  }
 }
 
 
@@ -187,15 +223,18 @@ function createContents(
                 'awblog',
                 item.release ? 'release' : 'not release')
             }</dd>
-            <dt>{getDomainText('awblog', 'editing')}</dt>
+            <dt>{getDomainText('awblog', 'editing status')}</dt>
             <dd>{
               getDomainText(
-                'awblog',
-                item.editing ? 'editing' : 'not editing')
+                'awblog', item.editing ? 'editing' : 'not editing')
             }</dd>
-            <dt>{getDomainText('awblog', 'Preview')}</dt>
-            <dd><ContentPreview contentId={item.contentId} /></dd>
           </dl>
+          <div>
+            <ItemOpration item={item}  />
+          </div>
+          <div>
+            <ContentPreview contentId={item.contentId} />
+          </div> 
         </li>
       </>
     ) 

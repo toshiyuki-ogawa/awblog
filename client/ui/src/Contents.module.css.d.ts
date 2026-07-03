@@ -3,6 +3,7 @@ declare const classes: {
   [key: string]: string
   controlItem: string
   controlContainer: string
+  toolContainer: string
 }
 
 export default classes

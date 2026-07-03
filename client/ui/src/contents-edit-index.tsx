@@ -8,6 +8,7 @@ import loadDataFromStorage from './storage'
 import { init as initAccount } from './account'
 import { loadEntryTitle } from './entry-title'
 import { loadIndexEntries } from './index-entries'
+import { loadBasename, getBasename } from './basename'
 import {
   initAccountLibrary as initGoogleAccountLib
 } from './oauth-token-google'
@@ -15,24 +16,9 @@ import {
 // start application
 (async () => {
 
-  /**
-   * get basename
-   */
-  async function getBasename(): Promise<string> {
-    let result = '/'
-    try {
-      const res = await fetch('basename.txt')
-      if (res.ok) {
-        result = await res.text()
-        result = result.trim()
-      }
-    } catch (e) {
-    }
-    return result
-  }
-
+  await loadBasename()
   const basename = await getBasename()
-  const succeeded = await loadI18nSetting(basename)
+  const succeeded = await loadI18nSetting(getBasename())
   await initAwblog()
   await loadEntryTitle()
   await loadIndexEntries("contents-edit-index.html")

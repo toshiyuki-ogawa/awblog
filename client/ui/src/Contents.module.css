@@ -13,6 +13,9 @@ input[type="number"].controlItem  {
   column-gap: 0.5em;
 }
 
+.toolContainer {
+  margin-left: .5em;
+}
 
 
 /* vi: se ts=2 sw=2 et: */
