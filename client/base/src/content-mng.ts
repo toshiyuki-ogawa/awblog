@@ -133,11 +133,6 @@ export async function getContent(
       method: 'GET',
       headers
     }
-    if (accessToken) {
-      const body = new URLSearchParams()
-      body.append('access-token', accessToken)
-      fetchOptions.body = body
-    }
 
     const res = await fetch(`${requestPath}?${searchParams}`, fetchOptions)
     if (res.ok && isOkResponse(res.headers)) {
