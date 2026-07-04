@@ -1,15 +1,17 @@
 import dtrack
+import email.utils
 import email_validator
+import flock
 import http 
 import io
 import json
 import log
 import multipart
+import os
 import sys
+import tomllib
 import traceback
 import urllib.parse
-import email.utils
-import flock
 
 from .accessctrl import AccessCtrl
 
@@ -40,7 +42,18 @@ class App:
             'list-content': self.list_content
         }
 
-    
+    def load_config_from_env(self):
+        """ load config from environment """ 
+        config = os.getenv('AWBLOG_CONFIG') 
+        if config is not None:
+            self.load_config(config)     
+
+    def load_config(self, config_path: str | Path):
+        """ load configuration """
+        with open(config_path, "rb") as fp:
+            config = tomllib.load(fp)
+            self._access_lock_file = config["lock-file"] 
+
     @property
     def dtrack_app(self):
         """ data tracking application """
@@ -59,6 +72,13 @@ class App:
             access_ctrl.load_setting()
             self._access_ctrl = access_ctrl
         return self._access_ctrl
+
+    @property
+    def access_lock_file(self):
+        """ file path to prevent from multiple access"""
+        if not "_access_lock_file" in self.__dict__:
+            self.load_config_from_env()
+        return self._access_lock_file
 
     def set_response(
             self, start_response,
@@ -195,7 +215,7 @@ class App:
             content_id = self.get_content_id(params)
             try:
                 if content_id is not None:
-                    with open(__file__) as fp:
+                    with open(self.access_lock_file, "r+") as fp:
                         flock.acquire_lock(fp)
                         content_exists = self.dtrack_app.content_editing_exists(
                             content_id)
@@ -498,7 +518,7 @@ class App:
                     if author and email_addr:
                         delete_editing = 'delete' in params
                         content_header = None
-                        with open(__file__) as fp:
+                        with open(self.access_lock_file, "r+") as fp:
                             flock.acquire_lock(fp)
                             self.dtrack_app.commit(
                                 content_id, delete_editing, author, email_addr)

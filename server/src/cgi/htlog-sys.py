@@ -98,6 +98,10 @@ class Service:
         if state:
             state = self.create_dtrack_conf()
         if state:
+            state = self.create_weblog_config()
+        if state:
+            state = self.create_weglog_access_ctrl_config()
+        if state:
             self.write_status_line(
                 http.HTTPStatus.OK,
                 http.HTTPStatus.OK.phrase)
@@ -142,6 +146,46 @@ stream-chunk-size = {stream_chunk_size}
             result = True
         return result
 
+    def create_weglog_access_ctrl_config(self):
+        """ create web log access control configuration  """
+        config = os.getenv("ACC_CTRL_CONFIG")
+        docroot = os.getenv("DOCUMENT_ROOT")
+        result = False 
+        if config and docroot:
+            config = pathlib.Path(config)
+            if not config.is_file():
+                config.parent.mkdir(mode=0o755, parents=True, exist_ok=True)
+                config_str = \
+f"""editor-list-path = "{docroot}/local/conf/editor-list.txt"
+google-client-id-path = "{docroot}/google-client-id.txt"
+"""
+                with open(config, "wf") as fp:
+                    fp.write(config_str)
+            result = True                 
+        return result
+
+    def create_weblog_config(self):
+        """ create web log configuration """
+        config = os.getenv("AWBLOG_CONFIG")
+        docroot = os.getenv("DOCUMENT_ROOT")
+        result = False
+        if config and docroot:
+            config = pathlib.Path(config)
+            if not config.is_file():
+                access_lock_file = pathlib.Path(docroot) \
+                    / "local" / "awblog-lock"
+                config.parent.mkdir(mode=0o755, parents=True, exist_ok=True)
+                access_lock_file.parent.mkdir(
+                        mode=0o755, parents=True, exist_ok=True)    
+                with open(access_lock_file, "w") as fp:
+                    fp.write("1\n")
+                config_str = \
+f"""lock-file = "{access_lock_file}"
+"""
+                with open(config, "w") as fp:
+                    fp.write(config_str)
+            result = True
+        return result
     def sys_write_log(self, params: dict):
         """ log output """
         self.run_with_secret(params, self.sys_write_log_impl)
