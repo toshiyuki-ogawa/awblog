@@ -207,6 +207,7 @@ export default function BinaryEdit(
       if (submitType == "file") {
         if (files.length) {
           setFile(files[0])
+          setBlobResponse(null)
         }
       } else if (submitType == "clear") {
         setFile(undefined) 
@@ -291,8 +292,8 @@ export default function BinaryEdit(
           </dl>
           <div
             className={commandContainerClass} >
-            <button name="update" value="file" >
-              {getDomainText('awblog', 'Update')}
+            <button name="update" value="file">
+              {getDomainText('awblog', 'Update with file')}
             </button>
             <button name="update" value="clear">
               {getDomainText('awblog', 'Clear')}
