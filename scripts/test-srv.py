@@ -4,10 +4,31 @@ import sys
 import socket
 import traceback
 import awblog
+import urllib.parse
 
 
 class CustomHandler(http.server.CGIHTTPRequestHandler):
 
+    def is_cgi(self):
+        result = super().is_cgi()
+
+        if not result:
+            path_res = urllib.parse.urlsplit(self.path)
+            _, ext = os.path.splitext(path_res.path)
+            result = '.cgi' == ext
+            if result:
+                idx = path_res.path.rfind('/')
+                head = ''
+                if idx != -1:
+                    head = path_res.path[:idx + 1]
+                tail = path_res.path
+                if path_res.query:
+                    tail += f"?{path_res.query}"
+                if path_res.fragment:
+                    tail += f"#{path_res.fragment}"
+                self.cgi_info = head, tail
+        return result
+        
 
     def do_GET(self):
         path = self.translate_path(self.path)

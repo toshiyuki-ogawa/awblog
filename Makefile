@@ -1,6 +1,7 @@
 
 deploy: deploy-local-python \
 	deploy-cgi \
+	deploy-cgi-entry \
 	deploy-secret \
 	deploy-awbconfig \
 	deploy-entry-title-json \
@@ -92,6 +93,14 @@ deploy-cgi: | htbin-dir
 
 .PHONY: deploy-cgi
 
+
+deploy-cgi-entry: docroot/awblog-index.cgi
+
+.PHONY: deploy-cgi-entry
+
+docroot/awblog-index.cgi: docroot/htbin/htlog.py 
+	cp $< $@
+	chmod +x $@
 
 clean-pycache:
 	find docroot/local/python -name '*.pyc' -o -name '__pycache__' -delete
