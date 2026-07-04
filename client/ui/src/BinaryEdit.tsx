@@ -1,5 +1,6 @@
 import { 
-  useState, useRef, useEffect, useImperativeHandle, useId
+  useState, useRef, useEffect, useEffectEvent, useImperativeHandle, useId,
+  Suspense, startTransition
 } from 'react'
 import BlobPreview from './BlobPreview'
 import { getDomainText } from './i18n'
@@ -207,8 +208,11 @@ export default function BinaryEdit(
         if (files.length) {
           setFile(files[0])
         }
-      } else {
+      } else if (submitType == "clear") {
         setFile(undefined) 
+        setBlobResponse(null)
+      } else if (submitType == "reload") {
+        loadFromServer()
       }
     }
   }
@@ -229,6 +233,19 @@ export default function BinaryEdit(
       }
     })()
   }
+
+  /**
+   * load contents from server
+   */
+  const loadFromServer = useEffectEvent(()=> {
+    startTransition(async ()=> {
+      const res = await getContent(
+        props.contentId, true, getOauthToken() ?? '')
+      setBlobResponse(res)
+    })
+
+  })
+
   useEffect(()=> {
     if (file) {
       let contentType = file.type
@@ -238,6 +255,10 @@ export default function BinaryEdit(
       props.contentTypeMng.setContentType(contentType)
     }
   }, [file])
+
+  useEffect(() => {
+    loadFromServer() 
+  }, [props.contentId])
 
   useImperativeHandle(props.ref, ()=> {
     return {
@@ -276,16 +297,21 @@ export default function BinaryEdit(
             <button name="update" value="clear">
               {getDomainText('awblog', 'Clear')}
             </button>
+            <button name="update" value="reload">
+              {getDomainText('awblog', 'Reload')}
+            </button>
           </div>
         </form>
       </div>
       <div>
-        <BlobPreview
-          contentResponse={blobResponse ?? undefined}
-          embedControlClassName={props.embedControlClassName}
-          blob={file}
-          contentType={file ? fileToContentType(file) : undefined}
-          />
+        <Suspense fallback={<p>loading...</p>}>
+          <BlobPreview
+            contentResponse={blobResponse ?? undefined}
+            embedControlClassName={props.embedControlClassName}
+            blob={file}
+            contentType={file ? fileToContentType(file) : undefined}
+            />
+        </Suspense>
       </div>
     </>
   )
