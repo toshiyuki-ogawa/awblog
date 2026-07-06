@@ -1,7 +1,8 @@
 
 import { 
   subscribe as subscribeOauthTokenGoogle, 
-  getOauthToken as getOauthTokenGoogle } from './google-oauth'
+  getOauthToken as getOauthTokenGoogle,
+  loadFromStorage as loadFromStorageGoogle } from './google-oauth'
 
 
 /**
@@ -108,6 +109,14 @@ export function teardown(): void {
   saveIntoStorage()
 }
 
+
+/**
+ * load oath token from storage
+ */
+export function loadOauthTokenFromStorage()
+{
+  loadFromStorageGoogle()
+}
 
 /**
  * load auth data from local storage

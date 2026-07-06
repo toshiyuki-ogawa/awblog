@@ -3,7 +3,12 @@ import GoogleSignIn from './GoogleSignIn'
 import { type JwtUser, getJwtUser }  from './jwt-user'
 import { 
   subscribe, 
-  getOauthToken} from './account'
+  getOauthToken,
+  loadOauthTokenFromStorage
+} from './account'
+import {
+  controlContainer as controlContainerClass
+} from './AccountMng.module.css'
 import { getDomainText } from './i18n'
 
 
@@ -11,13 +16,10 @@ import { getDomainText } from './i18n'
  * account manager properties
  */
 type AccountMngProperties = {
-
-
   /**
    * notify when signin button rendered
    */
   onButtonRendered?: (()=>void)
-
 }
 
 /**
@@ -35,7 +37,8 @@ type UserViewProperties = {
  */
 function UserView(props: UserViewProperties) {
 
-  const token = getOauthToken()
+  const token = useSyncExternalStore(subscribe, getOauthToken) 
+
 
   let jwtUser: JwtUser | null = null
   if (token) {
@@ -73,8 +76,16 @@ function UserView(props: UserViewProperties) {
  */
 export default function AccountMng(props: AccountMngProperties) {
 
-  useSyncExternalStore(subscribe, getOauthToken) 
 
+  /**
+   * form action
+   */
+  function action(formData: FormData) {
+    const cmd = formData.get("cmd") as string
+    if ("load" == cmd) {
+      loadOauthTokenFromStorage()
+    }
+  }
 
 
   return (
@@ -83,6 +94,14 @@ export default function AccountMng(props: AccountMngProperties) {
         <UserView 
           tokenType="google"
         />
+      </div>
+      <div
+        className={controlContainerClass}>
+        <form action={action}>
+          <button name="cmd" value="load">
+            {getDomainText('awblog', 'Reload token')}
+          </button>
+        </form>
       </div>
       <div>
         <GoogleSignIn 
