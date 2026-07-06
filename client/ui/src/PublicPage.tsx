@@ -5,7 +5,11 @@ import PublicContent from './PublicContent'
  * public page properties
  */
 type PublicPageProperties = {
-  [key: string]: string
+  /**
+   * navigation path to be created as react router link if the node is html
+   * anchor element.
+   */
+  navigationPath: string
 }
 
 
@@ -19,7 +23,8 @@ export default function PublicPage(props: PublicPageProperties) {
   if (searchParams.has('content-id')) {
     const contentId = parseInt(searchParams.get('content-id') as string)
     if (!isNaN(contentId)) {
-      return <PublicContent contentId={contentId} />
+      return <PublicContent contentId={contentId}
+        navigationPath={props.navigationPath} />
     } else {
       return null
     }

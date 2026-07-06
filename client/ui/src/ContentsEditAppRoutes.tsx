@@ -7,6 +7,7 @@ import MngPage from './MngPage'
 import EditAuthorPage from './EditAuthorPage'
 import SignInPage from './SignInPage'
 import StartEditingPage from './StartEditingPage'
+import { getBasename } from './basename'
 
 /**
  * awblog application 
@@ -16,7 +17,12 @@ export default function ContentsEditAppRoutes() {
     <>
       <Routes>
         <Route path="contents-mng.html" element={<Contents />} />
-        <Route path="public.html" element={<PublicPage />}/>
+        <Route path="public.html"
+          element={
+            <PublicPage 
+              navigationPath={`${getBasename()}public.html`}
+            />
+          }/>
         <Route path="page-mng.html" element={<MngPage />} />
         <Route path="start-editing.html" element={<StartEditingPage />} />
       </Routes>

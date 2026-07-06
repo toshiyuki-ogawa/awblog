@@ -12,7 +12,7 @@ import { loadBasename, getBasename } from './basename'
 import {
   initAccountLibrary as initGoogleAccountLib
 } from './oauth-token-google'
-
+import { getRootName } from './root-name'
 // start application
 (async () => {
 
@@ -27,7 +27,7 @@ import {
   loadDataFromStorage()
   initAccount()
 
-  createRoot(document.getElementById('main')!).render(
+  createRoot(document.getElementById(getRootName())!).render(
     <BrowserRouter basename={basename} >
       <ContentEditAppRoutes />
     </BrowserRouter>
