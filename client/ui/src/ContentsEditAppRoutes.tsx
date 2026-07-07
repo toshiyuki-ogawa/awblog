@@ -7,6 +7,7 @@ import MngPage from './MngPage'
 import EditAuthorPage from './EditAuthorPage'
 import SignInPage from './SignInPage'
 import StartEditingPage from './StartEditingPage'
+import TestPage from './TestPage'
 import { getBasename } from './basename'
 
 /**
@@ -25,6 +26,7 @@ export default function ContentsEditAppRoutes() {
           }/>
         <Route path="page-mng.html" element={<MngPage />} />
         <Route path="start-editing.html" element={<StartEditingPage />} />
+        <Route path="contents-edit-test.html" element={<TestPage />} />
       </Routes>
     </>
   )

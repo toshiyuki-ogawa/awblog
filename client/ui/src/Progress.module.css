@@ -1,0 +1,16 @@
+
+.progressBackground {
+  fill: var(--main-color-bg);
+}
+
+
+.progressForeground {
+  fill: var(--main-color-fg);
+}
+
+.progress {
+  width: 5em; 
+  height: 5em;
+}
+
+/* vi: se ts=2 sw=2 et: */
