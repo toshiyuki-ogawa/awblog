@@ -5,7 +5,6 @@ import os
 import pathlib
 import sys
 import urllib.parse
-
 import log
 
 
@@ -181,6 +180,7 @@ google-client-id-path = "{docroot}/google-client-id.txt"
                     fp.write("1\n")
                 config_str = \
 f"""lock-file = "{access_lock_file}"
+gettext-domain-dir = "{docroot}/local"
 """
                 with open(config, "w") as fp:
                     fp.write(config_str)

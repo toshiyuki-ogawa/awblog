@@ -12,6 +12,7 @@ import sys
 import tomllib
 import traceback
 import urllib.parse
+import gettext
 
 from .accessctrl import AccessCtrl
 
@@ -23,6 +24,7 @@ class App:
         """ consturctor """
         self.mem_limit = 1024 ** 2
         self.setup_dispatcher()
+        self.init_gettext()
 
     def setup_dispatcher(self):
         """ setup command dispatcher """
@@ -42,6 +44,10 @@ class App:
             'list-content': self.list_content
         }
 
+    def init_gettext(self):
+        """ init gettext """
+        gettext.bindtextdomain("awblog", self.gettext_domain_dir)
+
     def load_config_from_env(self):
         """ load config from environment """ 
         config = os.getenv('AWBLOG_CONFIG') 
@@ -53,6 +59,7 @@ class App:
         with open(config_path, "rb") as fp:
             config = tomllib.load(fp)
             self._access_lock_file = config["lock-file"] 
+            self._gettext_domain_dir = config["gettext-domain-dir"]
 
     @property
     def dtrack_app(self):
@@ -62,7 +69,6 @@ class App:
             dtrack_app.load_from_env()
             self._dtrack_app = dtrack_app
         return self._dtrack_app
-
 
     @property
     def access_ctrl(self):
@@ -79,6 +85,13 @@ class App:
         if not "_access_lock_file" in self.__dict__:
             self.load_config_from_env()
         return self._access_lock_file
+
+    @property
+    def gettext_domain_dir(self):
+        """ gettext domain directory """
+        if not "_gettext_domain_dir" in self.__dict__:
+            self.load_config_from_env()
+        return self._gettext_domain_dir
 
     def set_response(
             self, start_response,
@@ -201,7 +214,8 @@ class App:
                         [("content-type", "application/json")])
                 res = {
                     'status': 'NG',
-                    'message': 'Can not create content'
+                    'message': gettext.dgettext(
+                        'awblog','Can not create content')
                 }
             write(json.dumps(res).encode())
         else:
@@ -228,7 +242,9 @@ class App:
                         else:
                             res = {
                                 "status": "OK",
-                                "message": "Content is editing"
+                                "message": 
+                                    gettext.dgettext(
+                                        "awblog", "Content is editing")
                             }
                         flock.release_lock(fp)
                     writer = self.set_response(
@@ -542,16 +558,21 @@ class App:
                                 [("Content-Type", "application/json")])
                         msg = None
                         if not author and email_addr:
-                            msg = "Commit operation requires author"
+                            msg = gettext.dgettext(
+                                    "awblog",
+                                    "Commit operation requires author")
                         elif author and not email_addr:
                             if not email_err:
-                                msg = "Commit operation requires email"
+                                msg = gettext.dgettext(
+                                        "awblog", 
+                                        "Commit operation requires email")
                             else:
                                 msg = email_err
                         else:
                             if not email_err:
-                                msg = \
-                                    "Commit operaiton requires author and email"
+                                msg = gettext.dgettext(
+                                    "awblog",
+                                    "Commit operaiton requires author and email")
                             else:
                                 msg = email_err
                         res = {
@@ -560,7 +581,10 @@ class App:
                         }
                         writer(json.dumps(res).encode())
                 else:
-                    self.response_access_denied(start_response, 'No content id')
+                    self.response_access_denied(
+                        start_response,
+                        gettext.dgettext(
+                            "awblog", "No content id"))
             except:
                 self.set_response(
                         start_response,
@@ -575,7 +599,7 @@ class App:
                         traceback.format_exc())
         else:
             self.response_access_denied(start_response, \
-                'Not allow to commit')
+                gettext.dgettext("awblog", "Not allow to commit"))
         return []
  
     def get_history_oids(self, environ, start_response, params: dict):
@@ -599,7 +623,9 @@ class App:
                     }
                     writer(json.dumps(res).encode())
                 else:
-                    self.response_access_denied(start_response, 'No content id')
+                    self.response_access_denied(
+                        start_response,
+                        gettext.dgettext("awblog", "No content id"))
             except:
 
                 log.Log.print_log_warn_into_stream(
@@ -673,7 +699,9 @@ class App:
                     writer(json.dumps(res).encode())
      
                 else:
-                    self.response_access_denied(start_response, 'No content id')
+                    self.response_access_denied(
+                        start_response,
+                        gettext.dgettext("awblog", "No content id"))
             except:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
