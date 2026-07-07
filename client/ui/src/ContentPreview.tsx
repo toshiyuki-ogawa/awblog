@@ -1,5 +1,6 @@
 import { Suspense, startTransition, useState } from 'react'
 import { getContent, getContentHeader } from 'awblog-base'
+import Progress from './Progress'
 
 /**
  * content preview properties
@@ -57,7 +58,7 @@ export default function ContentPreview(props: ContentPreviewProperties) {
 
   return (
     <>
-      <Suspense fallback={<p>loading ... </p>}>
+      <Suspense fallback={<Progress />}>
         <Preview {...props} />
       </Suspense>
     </>

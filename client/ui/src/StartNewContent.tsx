@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'
 import { createContent } from 'awblog-base'
 import AccountLine from './AccountLine'
 import SimpleMessage from './SimpleMessage'
+import Progress from './Progress'
 import { getOauthToken } from './account'
 import { createMessageMng, type MessageMng } from './message-mng'
 import { getDomainText } from './i18n'
@@ -98,7 +99,7 @@ export default function StartNewContent(props: StartNewContentProperties) {
 
   if (!creating) {
     return (
-      <Suspense fallback={<p>loading...</p>}>
+      <Suspense fallback={<Progress />}>
         <AccountLine />
         <SimpleMessage messageMng={messageMng.current} />
         <div>
@@ -113,7 +114,7 @@ export default function StartNewContent(props: StartNewContentProperties) {
       </Suspense>
     )
   } else {
-    return <p>loading...</p>
+    return <Progress />
   }
 }
 

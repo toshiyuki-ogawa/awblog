@@ -3,6 +3,7 @@ import {
   Suspense, startTransition
 } from 'react'
 import BlobPreview from './BlobPreview'
+import Progress from './Progress'
 import { getDomainText } from './i18n'
 import { 
   updateContentWithBlob, getContentHeader, updateContentHeader, getContent
@@ -305,7 +306,7 @@ export default function BinaryEdit(
         </form>
       </div>
       <div>
-        <Suspense fallback={<p>loading...</p>}>
+        <Suspense fallback={<Progress />}>
           <BlobPreview
             contentResponse={blobResponse ?? undefined}
             embedControlClassName={props.embedControlClassName}

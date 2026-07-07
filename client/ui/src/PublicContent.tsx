@@ -12,6 +12,7 @@ import {
   type ReactNode } from 'react'
 import { Link } from 'react-router'
 import Markdown from 'react-markdown'
+import Progress from './Progress'
 import { type ExtraProps } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -176,7 +177,7 @@ export default function PublicContent(props: PublicContentProperties) {
 
   return (
     <>
-      <Suspense fallback={<p>loading...</p>}>
+      <Suspense fallback={<Progress />}>
         <Content { ...props} />
       </Suspense>
     </>

@@ -24,6 +24,7 @@ import LinkSelect, { type LinkItem } from './LinkSelect'
 import SimpleMessage from './SimpleMessage'
 import TextEdit from './TextEdit'
 import BinaryEdit from './BinaryEdit'
+import Progress from './Progress'
 import ContentTypeEdit, { type ContentTypeUiControl } from './ContentTypeEdit'
 import { getOauthToken } from './account'
 import { getAuthor } from './author'
@@ -303,7 +304,7 @@ export default function ContentEdit(props: ContentEditProperties) {
         saveAction={saveContent}
         commitAction={handleCommitContent}
         className={saveCommitToolbarClass}/>
-      <Suspense fallback={<p>loading...</p>}>
+      <Suspense fallback={<Progress />}>
         <ContentEditor />
       </Suspense>
     </>
