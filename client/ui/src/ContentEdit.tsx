@@ -264,6 +264,12 @@ export default function ContentEdit(props: ContentEditProperties) {
 
   return (
     <>
+      <ContentEditToolbar
+        saveAction={saveContent}
+        commitAction={handleCommitContent}
+        className={saveCommitToolbarClass}/>
+      <SimpleMessage messageMng={messageMng} />
+
       <TitleAccordion
         title={getDomainText('awblog', 'Save and commit option')}>
         <h1
@@ -299,11 +305,7 @@ export default function ContentEdit(props: ContentEditProperties) {
         </div>
       </TitleAccordion>
       <ContentTypeLine />
-      <SimpleMessage messageMng={messageMng} />
-      <ContentEditToolbar
-        saveAction={saveContent}
-        commitAction={handleCommitContent}
-        className={saveCommitToolbarClass}/>
+
       <Suspense fallback={<Progress />}>
         <ContentEditor />
       </Suspense>

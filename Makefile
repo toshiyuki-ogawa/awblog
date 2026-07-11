@@ -23,6 +23,13 @@ local-dir:
 assets-dir:
 	mkdir -p docroot/assets
 
+.PHONY: assets-dir
+
+assets-ace-dir: | assets-dir
+	mkdir -p docroot/assets/ace
+
+.PHONY: assets-ace-dir
+
 local-python-dir: | local-dir
 	rm -f -r docroot/local/python
 	mkdir -p docroot/local/python
@@ -110,7 +117,8 @@ clean-pycache:
 
 deploy-ui: client-ui-dist \
 	docroot-basename-txt \
-	docroot-google-client-id-txt | assets-dir
+	docroot-google-client-id-txt | assets-dir assets-ace-dir
+	rm -r -f docroot/assets/ace/*
 	rm -f docroot/assets/*.js*
 	rm -f docroot/assets/*.css*
 	cp client/ui/dist/*.css* docroot/assets
@@ -119,7 +127,7 @@ deploy-ui: client-ui-dist \
 	cp client/ui/contents-edit-index.html docroot
 	cp client/ui/index.css docroot
 	cp client/ui/index.html docroot
-
+	cp -r client/node_modules/ace-builds/src-min-noconflict/* docroot/assets/ace
 
 .PHONY: deploy-ui
 

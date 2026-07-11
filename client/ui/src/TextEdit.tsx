@@ -4,12 +4,27 @@ import {
   useId
 } from 'react'
 import * as ace from 'ace-builds'
+import { themesByName } from 'ace-builds/src-noconflict/ext-themelist'
 import { type DataControl } from './data-control'
 import { 
   getContent,
   updateContentWithStr,
   commit
 } from 'awblog-base'
+
+import TitleAccordion from './TitleAccordion'
+import EditorThemeSelector, {
+  type EditorThemeSelectorControl
+} from './EditorThemeSelector'
+
+import EditorModeSelector, {
+  type EditorModeSelectorControl
+} from './EditorModeSelector'
+
+import EditorTabSetting, {
+  type EditorTabSettingControl
+} from './EditorTabSetting'
+
 
 import { 
   editor as editorClass
@@ -18,6 +33,15 @@ import { getOauthToken } from './account'
 import { type ContentTypeMng } from './content-type-mng'
 import { type MessageMng } from './message-mng'
 import { getDomainText } from './i18n'
+import { isSoftTab, getTabSize } from './editor-tab'
+import { 
+  getTheme as getAceTheme,
+  setTheme as setAceTheme,
+  updateThemeWithStorage as updateAceThemeWithStorage,
+  getMode as getAceMode,
+  setMode as setAceMode,
+  updateModeWithStorage as updateAceModeWithStorage
+} from './ace'
 
 /**
  * editor properties
@@ -75,6 +99,7 @@ type TextEditProperties = {
    */
   ref?: React.Ref<DataControl>
 }
+
 
 /**
  * update text content with user selected file.
@@ -183,6 +208,12 @@ function Editor(props: EditorProperties) {
     if (editorRef.current && !editor) {
       const el = editorRef.current
       const aceEditor = ace.edit(el)
+
+      const editorTheme = getAceTheme()
+      if (editorTheme) {
+        aceEditor.setTheme(editorTheme)
+      }
+
       setEditor(aceEditor)
       onEditorAttached()
       if (props.onEditorAttached) {
@@ -209,25 +240,88 @@ function Editor(props: EditorProperties) {
  */
 export default function TextEdit(props: TextEditProperties) {
   const editor = useRef<ace.Editor | null>(null)
+  const themeSelectorControl = useRef<EditorThemeSelectorControl | null>(null)
+  const modeSelectorControl = useRef<EditorModeSelectorControl | null>(null)
+  /**
+   * synchronize theme control with editor
+   */
+  function syncThemeControlWithEditor(): void {
+    if (editor.current && themeSelectorControl.current) {
+      themeSelectorControl.current.setDefaultTheme(editor.current.getTheme())
+    }
+  }
+  /**
+   * synchronize mode control with editor
+   */
+  function syncEditorMode(): void {
+    if (editor.current && modeSelectorControl.current) {
 
+      let mode = getAceMode()
+      if (!mode) {
+        modeSelectorControl.current.setDefaultMode('ace/mode/text')
+      } else {
+        onModeSelected(mode)
+      }
+    }
+  }
+  /**
+   * sync editor setting with editor tab
+   */
+  function syncTabSettingWithEditorTab() {
+    if (editor.current) {
+      editor.current.session.setTabSize(getTabSize())
+      editor.current.session.setUseSoftTabs(isSoftTab())
+    }
+  }
   /**
    * handle editor attached event.
    */
-  function onEditorAttached(aceEditor: ace.Editor) {
+  function onEditorAttached(aceEditor: ace.Editor): void {
     editor.current = aceEditor
+    editor.current.setOption('navigateWithinSoftTabs', true)
+    syncThemeControlWithEditor()
+    syncTabSettingWithEditorTab()
   }
   /**
    * handle text load event
    */
-  function onTextLoad(text: string) {
+  function onTextLoad(text: string): void {
     if (editor.current) {
       editor.current.setValue(text)
     }
   }
   /**
+   * handle theme selected event
+   */
+  function onThemeSelected(theme: string): void {
+    if (editor.current) {
+      editor.current.setTheme(theme)
+    }
+  }
+
+  /**
+   * tab setting changed
+   */
+  function onTabSettingChanged(tabSize: number, softTab: boolean):void {
+    if (editor.current) {
+      editor.current.session.setTabSize(tabSize)
+      editor.current.session.setUseSoftTabs(softTab)
+    }
+  }
+
+  /**
+   * handle mode selected event
+   */
+  function onModeSelected(mode: string): void {
+    if (editor.current) {
+      editor.current.session.setMode(mode)
+    }
+  }
+ 
+  /**
    * save content
    */
-  function save() {
+  function save():void {
     if (editor.current) {
       const token = getOauthToken()
       if (token) {
@@ -251,6 +345,13 @@ export default function TextEdit(props: TextEditProperties) {
       }
     }
   } 
+  useEffect(() => {
+    syncThemeControlWithEditor()
+  }, [editor.current, themeSelectorControl.current])
+  useEffect(() => {
+    syncEditorMode()
+  }, [editor.current, modeSelectorControl.current])
+
 
   useImperativeHandle(props.ref, ()=> {
     return {
@@ -260,9 +361,35 @@ export default function TextEdit(props: TextEditProperties) {
 
   return (
     <>
+      <TitleAccordion
+        title={
+          getDomainText(
+            'awblog',
+            `Editor setting`)
+        } >
+       
+        <div>
+          <EditorThemeSelector 
+            ref={themeSelectorControl}
+            onThemeSelected={onThemeSelected}
+            />
+        </div>
+        <div>
+          <EditorModeSelector 
+            ref={modeSelectorControl}
+            onModeSelected={onModeSelected}
+            />
+        </div>
+        <div>
+          <EditorTabSetting
+            onTabSettingChanged={onTabSettingChanged}
+          />
+        </div>
+      </TitleAccordion>
       <UpdaterWithFile 
         onTextLoad = {onTextLoad} 
       />
+
       <Editor 
         onEditorAttached={onEditorAttached}
         { ...props } />

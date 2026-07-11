@@ -6,6 +6,8 @@ import { loadI18nSetting } from './i18n'
 import { loadContentTypes } from './content-types'
 import loadDataFromStorage from './storage'
 import { init as initAccount } from './account'
+import { init as initAce } from './ace'
+import { init as initEditorTab } from './editor-tab'
 import { loadEntryTitle } from './entry-title'
 import { loadIndexEntries } from './index-entries'
 import { loadBasename, getBasename } from './basename'
@@ -24,6 +26,8 @@ import { getRootName } from './root-name'
   await loadIndexEntries("contents-edit-index.html")
   await loadContentTypes() 
   await initGoogleAccountLib()
+  initEditorTab()
+  initAce()
   loadDataFromStorage()
   initAccount()
 
