@@ -82,6 +82,22 @@ export default function EditorTabSetting(props: EditorTabSettingProperties) {
   }
 
   /**
+   * handle submit event
+   */
+  function onSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+
+    const submitter =
+      e.nativeEvent.submitter as HTMLButtonElement | HTMLInputElement | null
+
+    if (submitter) {
+      formData.append(submitter.name, submitter.value)
+    }
+    action(formData)
+  }
+
+  /**
    * handle tab size changed event
    */
   function onTabSizeChanged(e: React.ChangeEvent<HTMLInputElement>) {
@@ -106,7 +122,9 @@ export default function EditorTabSetting(props: EditorTabSettingProperties) {
   }, [props.onTabSettingChanged, softTabEnable, editorTabSize])
 
   return (
-    <>
+    <form
+      onSubmit={onSubmit}
+      >
       <dl>
         <dt>
           <label
@@ -139,9 +157,6 @@ export default function EditorTabSetting(props: EditorTabSettingProperties) {
           </label>
         </dd>
       </dl>
-      <form
-        action={action}
-        >
         <div
           className={commandContainerClass}>
           <button name="verb" value="apply">
@@ -151,8 +166,7 @@ export default function EditorTabSetting(props: EditorTabSettingProperties) {
             {getDomainText('awblog', 'Update from storage')}
           </button>
         </div>
-      </form>
-    </>
+    </form>
   ) 
 }
 

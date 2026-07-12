@@ -8,6 +8,7 @@ import loadDataFromStorage from './storage'
 import { init as initAccount } from './account'
 import { init as initAce } from './ace'
 import { init as initEditorTab } from './editor-tab'
+import { init as initDownloadFileName } from './download-file-name'
 import { loadEntryTitle } from './entry-title'
 import { loadIndexEntries } from './index-entries'
 import { loadBasename, getBasename } from './basename'
@@ -28,6 +29,7 @@ import { getRootName } from './root-name'
   await initGoogleAccountLib()
   initEditorTab()
   initAce()
+  initDownloadFileName()
   loadDataFromStorage()
   initAccount()
 

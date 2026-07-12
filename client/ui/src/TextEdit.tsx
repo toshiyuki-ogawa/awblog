@@ -27,7 +27,8 @@ import EditorTabSetting, {
 
 
 import { 
-  editor as editorClass
+  editor as editorClass,
+  downloadCommandContainer as downloadCommandContainerClass
 } from './TextEdit.module.css'
 import { getOauthToken } from './account'
 import { type ContentTypeMng } from './content-type-mng'
@@ -42,6 +43,10 @@ import {
   setMode as setAceMode,
   updateModeWithStorage as updateAceModeWithStorage
 } from './ace'
+
+import { 
+  getTextFileName, setTextFileName
+} from './download-file-name'
 
 /**
  * editor properties
@@ -73,6 +78,28 @@ type UpdaterWithFileProperties = {
    * called when text loaded
    */
   onTextLoad: (text: string) => void
+}
+
+/**
+ * download properties
+ */
+type DownloadProperties = {
+
+  /**
+   * content id
+   */
+  contentId: number
+
+  /**
+   * content type manage ment
+   */
+  contentTypeMng: ContentTypeMng
+
+
+  /**
+   * get editor content
+   */
+  getEditorContent?: (()=>string)
 }
 
 /**
@@ -123,10 +150,19 @@ function UpdaterWithFile(props: UpdaterWithFileProperties) {
     }
   }
 
+  /**
+   * handle submit event
+   */
+  function onSubmit(e : React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    action(formData)
+  }
+
   const textInputId = useId()
   return (
     <div>
-      <form action={action}>
+      <form onSubmit={onSubmit}>
         <dl>
           <dt>
             <label htmlFor={textInputId}>
@@ -147,6 +183,134 @@ function UpdaterWithFile(props: UpdaterWithFileProperties) {
         </button>
       </form>
     </div>
+  )
+}
+
+
+/**
+ * download component
+ */
+function Download(props: DownloadProperties) {
+  
+  const anchorRef = useRef<HTMLAnchorElement | null>(null)
+  const [fileName, setFileName] = useState<string>(getTextFileName())
+  const fileNameId = useId()
+
+  const doDownload = useEffectEvent(()=>{
+    if (anchorRef.current) {
+      anchorRef.current.click()
+    } 
+  })
+
+  /**
+   * handl input value changed event
+   */
+  function onFileNameChanged(e: React.ChangeEvent<HTMLInputElement>) {
+    setFileName(e.target.value)
+  }
+
+  /**
+   * handle action event to save file name
+   */
+  function actionSaveFileName(formData: FormData) {
+    const verb = formData.get('verb') as string
+    if ('save' == verb) {
+      setTextFileName(fileName) 
+    }
+  }
+
+  /**
+   * handle action event
+   */
+  async function actionDownload(formData: FormData) {
+    const verb = formData.get('verb') as string
+    if ('download' == verb) {
+      let content = ''
+      if (props.getEditorContent) {
+        content = props.getEditorContent()
+      }
+      if (content && anchorRef.current) {
+        const contentType = props.contentTypeMng.getContentType()
+        if (contentType) {
+          const blob = new Blob([content], {type: contentType}) 
+          anchorRef.current.href = URL.createObjectURL(blob);
+          await (async ()=>{
+            doDownload()
+          })()
+        }
+      }
+    }
+  }
+
+  /**
+   * handle submit event
+   */
+  function onSubmitDownload(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    const submitter =
+      e.nativeEvent.submitter as HTMLButtonElement | HTMLInputElement | null
+
+    if (submitter) {
+      formData.append(submitter.name, submitter.value)
+    }
+    actionDownload(formData) 
+  }
+
+
+  /**
+   * submit save file name
+   */
+  function onSubmitSaveFileName(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target)
+    const submitter =
+      e.nativeEvent.submitter as HTMLButtonElement | HTMLInputElement | null
+    if (submitter) {
+      formData.append(submitter.name, submitter.value)
+    }
+    actionSaveFileName(formData)
+  }
+ 
+  return (
+    <>
+      <form action={actionSaveFileName}>
+        <dl>
+          <dt>
+            <label
+              htmlFor={fileNameId}>
+              {getDomainText('awblog', 'Download file name')}
+            </label>
+          </dt>
+          <dd>
+            <input id={fileNameId}
+              minLength={0}
+              maxLength={256}
+              onChange={onFileNameChanged}
+              value={fileName}  />
+          </dd>
+        </dl>
+        <button name="verb" value="save">
+          {getDomainText('awblog', 'Save')}
+        </button>
+      </form>
+      <a
+        ref={anchorRef}
+        download={fileName}
+        style={
+          {
+            display: 'none'
+          }
+        }
+        >download</a>
+      <form 
+        onSubmit={onSubmitDownload}
+        className={downloadCommandContainerClass} >
+        <button name="verb" value="download">
+          {getDomainText('awblog', 'Download')}
+        </button>
+      </form>
+    </>
   )
 }
 
@@ -282,6 +446,17 @@ export default function TextEdit(props: TextEditProperties) {
     syncThemeControlWithEditor()
     syncTabSettingWithEditorTab()
   }
+
+  /**
+   * handle event to get editor content
+   */
+  function getEditorContent(): string {
+    let result = ''
+    if (editor.current) {
+      result = editor.current.getValue()
+    }
+    return result
+  }
   /**
    * handle text load event
    */
@@ -367,7 +542,6 @@ export default function TextEdit(props: TextEditProperties) {
             'awblog',
             `Editor setting`)
         } >
-       
         <div>
           <EditorThemeSelector 
             ref={themeSelectorControl}
@@ -386,9 +560,20 @@ export default function TextEdit(props: TextEditProperties) {
           />
         </div>
       </TitleAccordion>
-      <UpdaterWithFile 
-        onTextLoad = {onTextLoad} 
-      />
+      <TitleAccordion
+        title={
+          getDomainText('awblog', 'Upload and download')
+        }>
+        <UpdaterWithFile 
+          onTextLoad = {onTextLoad} 
+        />
+        
+        <Download
+          contentId={props.contentId}
+          contentTypeMng={props.contentTypeMng}
+          getEditorContent={getEditorContent}
+          />
+      </TitleAccordion>
 
       <Editor 
         onEditorAttached={onEditorAttached}
