@@ -215,7 +215,7 @@ class App:
                 res = {
                     'status': 'NG',
                     'message': gettext.dgettext(
-                        'awblog','Can not create content')
+                        'awblog','Cannot create content')
                 }
             write(json.dumps(res).encode())
         else:
@@ -244,7 +244,7 @@ class App:
                                 "status": "OK",
                                 "message": 
                                     gettext.dgettext(
-                                        "awblog", "Content is editing")
+                                        "awblog", "Content is being editing")
                             }
                         flock.release_lock(fp)
                     writer = self.set_response(
@@ -560,19 +560,19 @@ class App:
                         if not author and email_addr:
                             msg = gettext.dgettext(
                                     "awblog",
-                                    "Commit operation requires author")
+                                    "Commit requires an author")
                         elif author and not email_addr:
                             if not email_err:
                                 msg = gettext.dgettext(
                                         "awblog", 
-                                        "Commit operation requires email")
+                                        "Commit orequires an email")
                             else:
                                 msg = email_err
                         else:
                             if not email_err:
                                 msg = gettext.dgettext(
                                     "awblog",
-                                    "Commit operaiton requires author and email")
+                                    "Commit requires both an author and an email")
                             else:
                                 msg = email_err
                         res = {
@@ -584,7 +584,7 @@ class App:
                     self.response_access_denied(
                         start_response,
                         gettext.dgettext(
-                            "awblog", "No content id"))
+                            "awblog", "No content ID"))
             except:
                 self.set_response(
                         start_response,
@@ -599,7 +599,7 @@ class App:
                         traceback.format_exc())
         else:
             self.response_access_denied(start_response, \
-                gettext.dgettext("awblog", "Not allow to commit"))
+                gettext.dgettext("awblog", "Commit is not allowed"))
         return []
  
     def get_history_oids(self, environ, start_response, params: dict):

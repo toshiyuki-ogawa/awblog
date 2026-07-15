@@ -38,17 +38,55 @@ export function getDomain(): string | null {
  * load domain message table
  */
 async function
-loadDomainMessage(basename: string):
+loadDomainMessageI(domainPath: string):
   Promise<{ [key: string]: { [key]: string } } | null> {
   let result = null
   try {
-    const req = await fetch(`${basename}domain-message/domain-message`)
-    result = await req.json()
+    const req = await fetch(domainPath)
+    if (req.ok) {
+      result = await req.json()
+    }
   } catch (e) {
     console.log(`got error ${e}`)
   }
   return result
 }
+
+/**
+ * load domain message with language
+ */
+async function loadDomainMessageWithLanguage(
+  basename: string, lang: string): 
+    Promise<{ [key: string]: { [key]: string } } | null> {
+  let result = null
+  let langPath = lang
+  while (true) {
+    const hyphenPos = langPath.lastIndexOf('-')
+    result = await loadDomainMessageI(
+      `${basename}domain-message/${langPath}/awblog.json`)
+    if (result != null) {
+      break 
+    }
+    if (hyphenPos == -1) {
+      break 
+    } else {
+      langPath = langPath.substring(0, hyphenPos)
+    }
+  }
+  return result
+}
+
+/**
+ * load domain message table
+ */
+async function
+loadDomainMessage(basename: string):
+  Promise<{ [key: string]: { [key]: string } } | null> {
+  return await loadDomainMessageWithLanguage(
+    basename, globalThis.navigator.language)
+}
+
+
 
 /**
  * load i18n setting from server
@@ -57,8 +95,12 @@ export async function loadI18nSetting(basename: string): Promise<boolean> {
   let result = true
   if (!i18nSetting.domainMessage) {
     const domainMessage = await loadDomainMessage(basename)
-    result = domainMessage ? true : false
-    i18nSetting.domainMessage = domainMessage
+    if (domainMessage != null) {
+      result = domainMessage ? true : false
+      i18nSetting.domainMessage = domainMessage
+    } else {
+      result = false
+    }
   }
   return result
 }

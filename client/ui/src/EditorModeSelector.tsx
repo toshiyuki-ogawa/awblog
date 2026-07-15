@@ -120,7 +120,7 @@ export default function EditorModeSelector(
         <button
           name="verb"
           value="update">
-          {getDomainText('awblog', 'Update from stroge')}
+          {getDomainText('awblog', 'Update with storage contents')}
         </button>
       </form>
     </>

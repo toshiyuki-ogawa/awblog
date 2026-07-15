@@ -34,4 +34,15 @@ ui-index-entries-json:
 
 .PHONY: ui-index-entries-json
 
+
+ui-awblog-pot: 
+	$(MAKE) -C ui awblog-pot
+
+.PHONY: ui-awblog-pot
+
+ui-awblog-msg-json:
+	$(MAKE) -C ui awblog-msg-json
+
+.PHONY: ui-awblog-msg-json
+
 # vi: se ts=4 sw=4 noet:

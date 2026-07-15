@@ -117,10 +117,12 @@ clean-pycache:
 
 deploy-ui: client-ui-dist \
 	docroot-basename-txt \
+	client-ui-awb-msg-json \
 	docroot-google-client-id-txt | assets-dir assets-ace-dir
 	rm -r -f docroot/assets/ace/*
 	rm -f docroot/assets/*.js*
 	rm -f docroot/assets/*.css*
+	rm -r -f docroot/domain-message
 	cp client/ui/dist/*.css* docroot/assets
 	cp client/ui/dist/*.js* docroot/assets
 	cp client/ui/contents-edit-index.css docroot
@@ -128,6 +130,7 @@ deploy-ui: client-ui-dist \
 	cp client/ui/index.css docroot
 	cp client/ui/index.html docroot
 	cp -r client/node_modules/ace-builds/src-min-noconflict/* docroot/assets/ace
+	cp -r client/ui/i18n-dist docroot/domain-message
 
 .PHONY: deploy-ui
 
@@ -177,5 +180,27 @@ client-ui-index-entries-json:
 	$(MAKE) -C client ui-index-entries-json
 
 .PHONY: client-ui-index-entries-json
+
+
+server-awblog-pot:
+	$(MAKE) -C server awblog-pot	
+
+.PHONY: server-awblog-pot
+
+client-ui-awblog-pot: 
+	$(MAKE) -C client ui-awblog-pot
+
+.PHONY: client-ui-awblog-pot
+
+awblog-pot: server-awblog-pot client-ui-awblog-pot
+
+.PHONY: awblog-pot
+
+client-ui-awb-msg-json:
+	$(MAKE) -e SOURCE_DIRS=$(abspath server/i18n-src) \
+		-C client ui-awblog-msg-json
+
+.PHONY: client-awb-msg-json
+
 
 # vi: se ts=4 sw=4 noet:

@@ -271,7 +271,7 @@ export default function ContentEdit(props: ContentEditProperties) {
       <SimpleMessage messageMng={messageMng} />
 
       <TitleAccordion
-        title={getDomainText('awblog', 'Save and commit option')}>
+        title={getDomainText('awblog', 'Save and commit settings')}>
         <h1
           className={optionTitleClass}>
           {getDomainText('awblog', 'Commit')}
@@ -284,7 +284,7 @@ export default function ContentEdit(props: ContentEditProperties) {
               >{
               getDomainText(
                 'awblog',
-                'Select the page to go to when you delete edit page.')
+                'Select the page to navigate to after deleting the page being edited.')
             }</label>
           </div>
           <LinkSelect

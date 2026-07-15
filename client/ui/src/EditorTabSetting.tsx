@@ -163,7 +163,7 @@ export default function EditorTabSetting(props: EditorTabSettingProperties) {
             {getDomainText('awblog', 'Apply')}
           </button>
           <button name="verb" value="reload">
-            {getDomainText('awblog', 'Update from storage')}
+            {getDomainText('awblog', 'Update with storage contents')}
           </button>
         </div>
     </form>

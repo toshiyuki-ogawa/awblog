@@ -1,0 +1,51 @@
+# awblog message file.
+# Copyright (C) 2026 Toshiyuki Ogawa
+# This file is distributed under the same license as the awblog package.
+# Toshiyuki Ogawa<toshiyuki.ogawa.2.71@gmail.com>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: awblog 0.0.1\n"
+"Report-Msgid-Bugs-To: toshiyuki.ogawa.2.71@gmail.com\n"
+"POT-Creation-Date: 2026-07-15 07:29+0900\n"
+"PO-Revision-Date: 2026-07-12 17:45+9:00\n"
+"Last-Translator: Toshiyuki Ogawa<toshiyuki.ogawa.2.71@gmai.com>\n"
+"Language-Team: Toshiyuki Ogawa<toshiyuki.ogawa.2.71@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/awblog/app.py:218
+msgid "Cannot create content"
+msgstr "コンテンツを作成できません。"
+
+#: src/awblog/app.py:247
+msgid "Content is being editing"
+msgstr "コンテンツは編集中です。"
+
+#: src/awblog/app.py:563
+msgid "Commit requires an author"
+msgstr "コミットには著者が必要です。"
+
+#: src/awblog/app.py:568
+msgid "Commit orequires an email"
+msgstr "コミットには、emailが必要です。"
+
+#: src/awblog/app.py:575
+msgid "Commit requires both an author and an email"
+msgstr "コミットには、著者とemailが必要です。"
+
+#: src/awblog/app.py:587
+msgid "No content ID"
+msgstr "コンテンツIDがありません。"
+
+#: src/awblog/app.py:602
+msgid "Commit is not allowed"
+msgstr "コミットは許可されていません。"
+
+#: src/awblog/app.py:628 src/awblog/app.py:704
+msgid "No content id"
+msgstr "コンテンツIDがありません。"
+

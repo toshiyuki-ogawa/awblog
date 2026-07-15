@@ -1,0 +1,6 @@
+PROJECT_ROOT=${script_dir}/..
+SRC_DIR=src
+COPYRIGHT="Toshiyuki Ogawa"
+PACKAGE_NAME=awblog-msg
+PACKAGE_VERSION=0.0.1
+MSGID_BUGS_ADDRESS=toshiyuki.ogawa.2.71@gmail.com
