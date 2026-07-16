@@ -3,12 +3,13 @@
 # This file is distributed under the same license as the awblog-msg package.
 # Toshiyuki Ogawa<toshiyuki.ogawa.2.71@gmail.com>, redo
 #
+#: src/ContentTypeEdit.tsx:114 src/TextEdit.tsx:515 src/BinaryEdit.tsx:95
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: awblog-msg 0.0.2\n"
 "Report-Msgid-Bugs-To: toshiyuki.ogawa.2.71@gmail.com\n"
-"POT-Creation-Date: 2026-07-15 08:03+0900\n"
+"POT-Creation-Date: 2026-07-17 06:08+0900\n"
 "PO-Revision-Date: 2026-07-12 17:48+0900\n"
 "Last-Translator: Toshiyuki Ogawa <toshiyuki.ogawa.2.71@gmail.com>\n"
 "Language-Team: ja <toshiyuki.ogawa.2.71@gmail.com>\n"
@@ -52,23 +53,27 @@ msgstr "適用"
 msgid "Create"
 msgstr "作成"
 
-#: src/ContentEdit.tsx:274
+#: src/ContentEdit.tsx:255
+msgid "Content type: %s"
+msgstr "コンテントタイプ: %s"
+
+#: src/ContentEdit.tsx:275
 msgid "Save and commit settings"
 msgstr "保存とコミット"
 
-#: src/ContentEdit.tsx:277 src/ContentEditToolbar.tsx:72
+#: src/ContentEdit.tsx:278 src/ContentEditToolbar.tsx:72
 msgid "Commit"
 msgstr "コミット"
 
-#: src/ContentEdit.tsx:287
+#: src/ContentEdit.tsx:288
 msgid "Select the page to navigate to after deleting the page being edited."
 msgstr "編集ページ削除したときに移動するページを選択してください。"
 
-#: src/ContentEdit.tsx:297 src/AccountLine.tsx:90
+#: src/ContentEdit.tsx:298 src/AccountLine.tsx:90
 msgid "Account"
 msgstr "アカウント"
 
-#: src/ContentEdit.tsx:302 src/AuthorLine.tsx:87 src/EditAuthorLine.tsx:94
+#: src/ContentEdit.tsx:303 src/AuthorLine.tsx:87 src/EditAuthorLine.tsx:94
 #: src/EditAuthorPage.tsx:57 src/EditAuthor.tsx:95 src/EditAuthor.tsx:171
 msgid "Author"
 msgstr "著者"
@@ -79,7 +84,7 @@ msgstr "モード"
 
 #: src/ContentTypeEdit.tsx:132
 msgid "Content type"
-msgstr "コンテンツタイプ"
+msgstr "コンテントタイプ"
 
 #: src/ContentTypeEdit.tsx:153
 msgid "Load"
@@ -117,7 +122,7 @@ msgstr "Email"
 
 #: src/AccountMng.tsx:61
 msgid "Email verified"
-msgstr "Email認証済"
+msgstr "Email認証状態"
 
 #: src/AccountMng.tsx:63
 msgid "Token expiration"
@@ -149,7 +154,7 @@ msgstr "アプロード・ダウンロード"
 
 #: src/CommitOption.tsx:24
 msgid "Delete editing content on commit"
-msgstr "コミット時に編集コンテンツを削除"
+msgstr "コミット時に編集コンテントを削除"
 
 #: src/Contents.tsx:50
 msgid "Line Number"
@@ -215,4 +220,3 @@ msgstr "消去"
 #: src/BinaryEdit.tsx:303
 msgid "Reload"
 msgstr "再読み込み"
-

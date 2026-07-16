@@ -25,16 +25,33 @@ type GoogleSignInProperties = {
 export default function GoogleSignIn(props: GoogleSignInProperties) {
   
   const signInRef = useRef<HTMLDivElement | null>(null)
-  
+
+  const [darkMode, setDarkMode] = useState(
+    globalThis.matchMedia('(prefers-color-scheme: dark)') ? true : false)
+
+
+  /**
+   * notify mode change
+   */
+  function handleModeChanged(e: MediaQueryListEvent) {
+    setDarkMode(e.matches ? true : false)
+  }
 
   useEffect(() => {
+    globalThis.matchMedia('(prefers-color-scheme: dark)').addEventListener(
+      "change", handleModeChanged)
+  })
+  useEffect(() => {
     if (signInRef.current) {
+      const theme = darkMode ? 'outline_dark' : 'outline'
+
       google.accounts.id.renderButton(
         signInRef.current, {
-          type: 'standard'
+          type: 'standard',
+          theme: theme
         })
     }
-  })
+  }, [darkMode])
 
   return (
     <div

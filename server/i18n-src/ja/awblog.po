@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: awblog 0.0.1\n"
 "Report-Msgid-Bugs-To: toshiyuki.ogawa.2.71@gmail.com\n"
-"POT-Creation-Date: 2026-07-15 07:29+0900\n"
+"POT-Creation-Date: 2026-07-16 07:28+0900\n"
 "PO-Revision-Date: 2026-07-12 17:45+9:00\n"
 "Last-Translator: Toshiyuki Ogawa<toshiyuki.ogawa.2.71@gmai.com>\n"
 "Language-Team: Toshiyuki Ogawa<toshiyuki.ogawa.2.71@gmail.com>\n"
@@ -21,31 +21,45 @@ msgstr ""
 msgid "Cannot create content"
 msgstr "コンテンツを作成できません。"
 
-#: src/awblog/app.py:247
+#: src/awblog/app.py:225
+msgid "Creating content is not allowed"
+msgstr "コンテントの作成は許可されていません。"
+
+#: src/awblog/app.py:249
 msgid "Content is being editing"
-msgstr "コンテンツは編集中です。"
+msgstr "コンテントは編集中です。"
 
-#: src/awblog/app.py:563
-msgid "Commit requires an author"
-msgstr "コミットには著者が必要です。"
-
-#: src/awblog/app.py:568
-msgid "Commit orequires an email"
-msgstr "コミットには、emailが必要です。"
-
-#: src/awblog/app.py:575
-msgid "Commit requires both an author and an email"
-msgstr "コミットには、著者とemailが必要です。"
-
-#: src/awblog/app.py:587
+#: src/awblog/app.py:261 src/awblog/app.py:448 src/awblog/app.py:489
+#: src/awblog/app.py:530 src/awblog/app.py:606 src/awblog/app.py:647
+#: src/awblog/app.py:723
 msgid "No content ID"
 msgstr "コンテンツIDがありません。"
 
-#: src/awblog/app.py:602
+#: src/awblog/app.py:277
+msgid "Editing content is not allowed"
+msgstr "コンテントの編集は許可されていません。"
+
+#: src/awblog/app.py:314
+msgid "Updating content is not allowed"
+msgstr "コンテントの更新は許可されていません。"
+
+#: src/awblog/app.py:453
+msgid "Updating header is not allowed"
+msgstr "ヘッダの更新は許可されていません。"
+
+#: src/awblog/app.py:582
+msgid "Commit requires an author"
+msgstr "コミットには著者が必要です。"
+
+#: src/awblog/app.py:587
+msgid "Commit orequires an email"
+msgstr "コミットには、emailが必要です。"
+
+#: src/awblog/app.py:594
+msgid "Commit requires both an author and an email"
+msgstr "コミットには、著者とemailが必要です。"
+
+#: src/awblog/app.py:621
 msgid "Commit is not allowed"
 msgstr "コミットは許可されていません。"
-
-#: src/awblog/app.py:628 src/awblog/app.py:704
-msgid "No content id"
-msgstr "コンテンツIDがありません。"
 

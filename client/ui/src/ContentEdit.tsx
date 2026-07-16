@@ -3,6 +3,7 @@ import {
   useRef, useId, useSyncExternalStore
 } from 'react'
 import { useNavigate } from 'react-router'
+import { sprintf } from 'sprintf-js'
 import { 
   getContent,
   updateContentWithStr,
@@ -37,7 +38,6 @@ import { type DataControl } from './data-control'
 import { getContentTypes } from './content-types'
 import { createContentTypeMng } from './content-type-mng'
 import { createMessageMng, type MessageMng } from './message-mng'
-
 
 /**
  * content edit properties
@@ -249,9 +249,10 @@ export default function ContentEdit(props: ContentEditProperties) {
     return (
       <TitleAccordion
         title={
-          getDomainText(
-            'awblog',
-            `Content type: ${contentType}`)
+          sprintf(
+            getDomainText(
+              'awblog',
+              'Content type: %s'), contentType)
         } >
         <ContentTypeEdit
           contentTypeMng={contentTypeMng}

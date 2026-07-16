@@ -219,8 +219,10 @@ class App:
                 }
             write(json.dumps(res).encode())
         else:
-            self.response_access_denied(start_response, \
-                    'Not allow to create content')
+            self.response_access_denied(start_response, 
+                    gettext.dgettext(
+                        'awblog', 
+                        'Creating content is not allowed'))
         return result
     def edit_content(self, environ, start_response, params: dict):
         """ create content for editing """
@@ -254,7 +256,9 @@ class App:
                             [("Content-Type", "application/json")])
                     writer(json.dumps(res).encode()) 
                 else:
-                    self.response_access_denied(start_response, 'No content id')
+                    self.response_access_denied(
+                            start_response,
+                            gettext.dgettext('awblog', 'No content ID'))
             except:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
@@ -269,7 +273,8 @@ class App:
                         [])
         else:
             self.response_access_denied(start_response, 
-                    'Not allow to edit content')
+                    gettext.dgettext(
+                        'awblog', 'Editing content is not allowed'))
              
         return []
         
@@ -302,8 +307,11 @@ class App:
                     http.HTTPStatus.BAD_REQUEST.phrase,
                     [])
         else:
-            result = self.response_access_denied(start_response, \
-                    'Not allow to update content')
+            result = self.response_access_denied(
+                    start_response, 
+                    gettext.dgettext(
+                        'awblog',
+                        'Updating content is not allowed'))
         return result
 
     def update_content_with_multipart(
@@ -434,10 +442,15 @@ class App:
                         http.HTTPStatus.BAD_REQUEST.phrase,
                         [])
             else:
-                self.response_access_denied(start_response, 'No content id') 
+                self.response_access_denied(
+                        start_response, 
+                        gettext.dgettext(
+                            'awblog', 'No content ID')) 
         else:
             self.response_access_denied(start_response, \
-                'Not allow to update header')
+                gettext.dgettext(
+                    'awblog',
+                    'Updating header is not allowed'))
         return [] 
     def get_content(self, environ, start_response, params: dict):
         """ get content """
@@ -471,7 +484,9 @@ class App:
                         writer(buf) 
                         
                 else:
-                    self.response_access_denied(start_response, 'No content id') 
+                    self.response_access_denied(
+                            start_response,
+                            gettext.dgettext('awblog', 'No content ID')) 
             except:
                 self.set_response(
                         start_response,
@@ -508,7 +523,11 @@ class App:
                             [("Content-Type", "application/json")])
                     writer(json.dumps(content_header.header).encode()) 
                 else:
-                    self.response_access_denied(start_response, 'No content id') 
+                    self.response_access_denied(
+                            start_response,
+                            gettext.dgettext(
+                                'awblog',
+                                'No content ID'))
             except:
                 self.set_response(
                         start_response,
@@ -598,7 +617,7 @@ class App:
                         environ['wsgi.errors'],
                         traceback.format_exc())
         else:
-            self.response_access_denied(start_response, \
+            self.response_access_denied(start_response, 
                 gettext.dgettext("awblog", "Commit is not allowed"))
         return []
  
@@ -625,7 +644,7 @@ class App:
                 else:
                     self.response_access_denied(
                         start_response,
-                        gettext.dgettext("awblog", "No content id"))
+                        gettext.dgettext("awblog", "No content ID"))
             except:
 
                 log.Log.print_log_warn_into_stream(
@@ -701,7 +720,7 @@ class App:
                 else:
                     self.response_access_denied(
                         start_response,
-                        gettext.dgettext("awblog", "No content id"))
+                        gettext.dgettext("awblog", "No content ID"))
             except:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
