@@ -190,7 +190,7 @@ function UpdaterWithFile(props: UpdaterWithFileProperties) {
 /**
  * download component
  */
-function Download(props: DownloadProperties) {
+function Download0(props: DownloadProperties) {
   
   const anchorRef = useRef<HTMLAnchorElement | null>(null)
   const [fileName, setFileName] = useState<string>(getTextFileName())
@@ -314,6 +314,65 @@ function Download(props: DownloadProperties) {
   )
 }
 
+/**
+ * download component with extension
+ */
+function DownloadWithExtension(props: DownloadProperties) {
+
+  const startDownload = useEffectEvent((data: string)=> {
+    (async ()=> {
+      try {
+        const fileHandle = await (globalThis as any).showSaveFilePicker()
+        if (fileHandle) {
+          const fw = await fileHandle.createWritable()
+          await fw.write(data)
+          await fw.close()
+        }
+      } catch (err) {
+      }
+    })() 
+  })
+
+  /**
+   * handle action event
+   */
+  async function actionDownload(formData: FormData) {
+    const verb = formData.get('verb') as string
+    if ('download' == verb) {
+      let content = ''
+      if (props.getEditorContent) {
+        content = props.getEditorContent()
+      }
+      if (content) {
+        await (async ()=>{
+          startDownload(content)
+        })()
+      }
+    }
+  }
+
+  return (
+    <form action={actionDownload}>
+      <button name="verb" value="download">
+        {getDomainText('awblog', 'Download...')}
+      </button>
+    </form>
+  ) 
+}
+
+
+/**
+ * download component
+ */
+function Download(props: DownloadProperties) {
+
+  if ((globalThis as any).showSaveFilePicker) {
+    return <DownloadWithExtension { ...props } />
+  } else {
+    return <Download0 { ...props } />
+  }
+}  
+ 
 
 /**
  * editor
