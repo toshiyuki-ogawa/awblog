@@ -29,5 +29,7 @@ class ResCtrl:
         result = None
         if entry in self.entry_to_real_file_map:
             result = self.entry_to_real_file_map[entry]
+            if not result:
+                result = entry
         return result
 # vi: se ts=4 sw=4 et:

@@ -38,14 +38,19 @@ class CustomHandler(http.server.CGIHTTPRequestHandler):
             base_name = os.path.basename(path)
             new_base_name = resctl.get_resource(base_name)
             if new_base_name:
-                self.path = os.path.join(
-                    os.path.dirname(self.path), new_base_name)  
-            #else:
-            #    _, ext = os.path.splitext(path)
-            #    if ".html" == ext:
-            #        self.path = os.path.join(
-            #                os.path.dirname(self.path), "index.html")  
+                if base_name != new_base_name:
+                    self.path = os.path.join(
+                        os.path.dirname(self.path), new_base_name)  
+                self.resource_ctl_path = True
+
         super().do_GET()
+
+    def end_headers(self):
+        if 'resource_ctl_path' in self.__dict__ and self.resource_ctl_path:
+            self.send_header(
+                'Cross-Origin-Opener-Policy',
+                ','.join(['same-origin', 'same-origin-allow-popups']))
+        super().end_headers()
         
     def run_cgi(self):
 
