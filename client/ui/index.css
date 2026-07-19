@@ -1,5 +1,6 @@
 
 :root {
+  font-family: sans-serif, ui-sans-serif, system-ui;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -24,8 +25,4 @@
     --main-color-disable-fg: color-mix(in oklab, var(--main-color-fg) 80%, var(--main-color-bg));
   }
 }
-
-
-
-
 /* vi: se ts=2 sw=2 et: */
