@@ -118,7 +118,8 @@ clean-pycache:
 deploy-ui: client-ui-dist \
 	docroot-basename-txt \
 	client-ui-awb-msg-json \
-	docroot-google-client-id-txt | assets-dir assets-ace-dir
+	docroot-google-client-id-txt \
+	docroot-initial-id-txt | assets-dir assets-ace-dir
 	rm -r -f docroot/assets/ace/*
 	rm -f docroot/assets/*.js*
 	rm -f docroot/assets/*.css*
@@ -148,6 +149,13 @@ docroot/google-client-id.txt: conf/google-client-setting.json
 docroot-google-client-id-txt: docroot/google-client-id.txt
 
 .PHONY: docroot-google-client-id-txt
+
+docroot/initial-id.txt: conf/initial-id.txt
+	cp $< $@
+
+docroot-initial-id-txt: docroot/initial-id.txt
+
+.PHONY: docroot-initial-id-txt
 
 client-base-dist:
 	$(MAKE) -C client base-dist	

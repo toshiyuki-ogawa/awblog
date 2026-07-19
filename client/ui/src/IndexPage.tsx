@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router'
 import PublicContent from './PublicContent'
-
+import { getStartContentId } from './initial-content'
 /**
  * index page properties
  */
@@ -19,15 +19,15 @@ type IndexPageProperties = {
 export default function IndexPage(props: IndexPageProperties) {
 
   let [searchParams] = useSearchParams()
-
+  let contentId = 0
   if (searchParams.has('content-id')) {
-    const contentId = parseInt(searchParams.get('content-id') as string)
-    if (!isNaN(contentId)) {
-      return <PublicContent contentId={contentId}
-        navigationPath={props.navigationPath} />
-    } else {
-      return null
-    }
+    contentId = parseInt(searchParams.get('content-id') as string)
+  } else {
+    contentId = getStartContentId()
+  }
+  if (!isNaN(contentId) && contentId) {
+    return <PublicContent contentId={contentId}
+      navigationPath={props.navigationPath} />
   } else {
     return null
   }

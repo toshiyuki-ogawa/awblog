@@ -48,6 +48,8 @@ import {
   getTextFileName, setTextFileName
 } from './download-file-name'
 
+import { getContentTypes } from './content-types'
+
 /**
  * editor properties
  */
@@ -127,6 +129,23 @@ type TextEditProperties = {
   ref?: React.Ref<DataControl>
 }
 
+/**
+ * get true if content type is in text category.  
+ */
+function isTextType(contentType: string): boolean {
+  const contentTypeItem = getContentTypes()
+    .find((item) => item[0] == contentType) 
+  let result = false
+  if (contentTypeItem) {
+    if (contentTypeItem.length > 2) {
+      result = contentTypeItem[2].indexOf('text') != -1
+    } else {
+      result = contentType.indexOf('text') != -1
+    }
+  }
+  return result
+}
+ 
 
 /**
  * update text content with user selected file.
@@ -395,7 +414,7 @@ function Editor(props: EditorProperties) {
       if (contentRes) {
         const contentResType = contentRes.headers.get('Content-Type') ?? ''
         if (contentResType) {
-          if (contentResType.indexOf('text') != -1) {
+          if (isTextType(contentResType)) {
             contentResData = await contentRes.text()
           } else {
             contentResData = undefined
@@ -451,7 +470,7 @@ function Editor(props: EditorProperties) {
     } 
   }, [content, editor])
 
-  if (contentType.indexOf('text') != -1) {
+  if (isTextType(contentType)) {
     return <div className={editorClass} ref={editorRef}></div>
   } else {
     return null

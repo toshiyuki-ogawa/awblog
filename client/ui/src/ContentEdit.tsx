@@ -135,11 +135,17 @@ function selectEditorTypeWithContentType(
   contentType: string): string | null {
  
   let result = null
-  if (isSupportedContentType(contentType)) {
-    if (contentType.indexOf("text") != -1) {
-      result = "text"
+  const contentTypeItem = getContentTypes()
+    .find((item) => item[0] == contentType) 
+  if (contentTypeItem) {
+    if (contentTypeItem.length > 2) {
+      result = contentTypeItem[2]
     } else {
-      result = "binary"
+      if (contentType.indexOf('text') != -1) {
+        result = 'text'
+      } else {
+        result = 'binary'
+      }
     }
   }   
   return result

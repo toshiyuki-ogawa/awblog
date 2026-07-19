@@ -10,6 +10,11 @@ export default function ContentsEditAppRoutes() {
   return (
     <>
       <Routes>
+        <Route path={getBasename()} element={
+            <IndexPage 
+              navigationPath={`${getBasename()}`}
+            />
+        } />
         <Route path="index.html"
           element={
             <IndexPage 
