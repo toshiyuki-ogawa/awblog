@@ -1,1 +1,2 @@
 contents-edit-index.html, src/ContentsEditAppRoutes.tsx
+index.html, src/PublicAppRoutes.tsx

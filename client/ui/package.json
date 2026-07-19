@@ -9,7 +9,7 @@
   "author": "Toshiyuki Ogawa",
   "type": "module",
   "browserslist": "baseline widely available",
-  "source": "src/contents-edit-index.tsx",
+  "source": ["src/contents-edit-index.tsx", "src/index.tsx" ],
   "targets": {
     "html": {
       "outputFormat": "global"

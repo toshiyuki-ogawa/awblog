@@ -5,5 +5,8 @@
     "page-mng.html",
     "start-editing.html",
     "contents-edit-test.html"
+  ],
+  "index.html": [
+    "index.html"
   ]
 }
