@@ -71,7 +71,7 @@ copy log into stream
                     if read_size == 0:
                         break
                     if read_size < len(chunk):
-                        chunk.resize(read_size)
+                        chunk = chunk[:read_size]
                     strm.write(chunk)
                     total_size += read_size
         except:
