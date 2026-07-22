@@ -32,7 +32,7 @@ export default function AccountLine(props: AccountLineProperties) {
   const [ accordionClasses, setAccordionClasses ] = useState(
     new Set(
       props.open ?  [accordionClass] : [accordionClass, accCloseClass]))
-  useSyncExternalStore(subscribe, getOauthToken) 
+  const oauthToken = useSyncExternalStore(subscribe, getOauthToken) 
   const [ accMngCntMaxHeight, setAccMngCntMaxHeight ] = 
     useState<number | null>(null)
   const accMngCntRef = useRef<HTMLDivElement | null>(null)
@@ -68,7 +68,7 @@ export default function AccountLine(props: AccountLineProperties) {
   }
   useEffect(() => {
     onUpdateAccMngCntHeight()
-  }, [accMngCntRef.current])
+  }, [accMngCntRef.current, oauthToken])
 
 
   /**
