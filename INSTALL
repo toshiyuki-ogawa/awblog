@@ -1,0 +1,6 @@
+
+1. pip install email-validator
+2. pip install multipart
+3. pip install google-auth
+4. pip install requests
+
