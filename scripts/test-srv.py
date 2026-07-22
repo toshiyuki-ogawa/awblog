@@ -42,6 +42,9 @@ class CustomHandler(http.server.CGIHTTPRequestHandler):
                     self.path = os.path.join(
                         os.path.dirname(self.path), new_base_name)  
                 self.resource_ctl_path = True
+        elif '/' == self.path:
+            self.path = '/index.html' 
+            self.resource_ctl_path = True
 
         super().do_GET()
 
@@ -105,7 +108,7 @@ if __name__ == '__main__':
     import argparse
     import contextlib
 
-    parser = argparse.ArgumentParser(color=True)
+    parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--bind', metavar='ADDRESS',
                         help='bind to this address '
                              '(default: all interfaces)')
