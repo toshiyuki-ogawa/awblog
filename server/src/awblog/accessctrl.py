@@ -1,11 +1,11 @@
 import log
 import os
-import sys
 import tomllib
 import traceback
 
-from pathlib import Path
 from .google import Auth as GoogleAuth
+
+__all__ = ['AccessCtrl']
 
 class AccessCtrl:
     """ access control """
@@ -21,10 +21,10 @@ class AccessCtrl:
                     ln = ln.strip()
                     if len(ln):
                         result.add(ln) 
-        except:
+        except Exception as ex:
             log.Log.print_log_warn(
                 os.environ,
-                repr(sys.exception()))
+                repr(ex))
             log.Log.print_log_warn(
                 os.environ,
                 traceback.format_exc())
@@ -76,10 +76,10 @@ class AccessCtrl:
                     log.Log.print_log_warn(
                         os.environ,
                         "Not set google-client-id-path")
-        except:
+        except Exception as ex:
             log.Log.print_log_warn(
                 os.environ,
-                repr(sys.exception()))
+                repr(ex))
             log.Log.print_log_warn(
                 os.environ,
                 traceback.format_exc())
@@ -111,7 +111,7 @@ class AccessCtrl:
   
         return result
      
-    def read_email_from_bearer(self, environ: dist):
+    def read_email_from_bearer(self, environ: dict):
         """ read email from bearer """
         result = None
         authorization = environ['AUTHORIZATION'] \
@@ -161,10 +161,10 @@ class AccessCtrl:
             email = self.read_email_from_bearer(environ) 
             if email:
                 result = email in self.editors     
-        except:
+        except Exception as ex:
             log.Log.print_log_warn_into_stream(
                 environ['wsgi.errors'],
-                repr(sys.exception()))
+                repr(ex))
             log.Log.print_log_warn_into_stream(
                 environ['wsgi.errors'],
                 traceback.format_exc())

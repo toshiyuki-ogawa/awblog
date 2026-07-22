@@ -1,7 +1,6 @@
 import datetime
 import flock
 import pathlib
-import sys
 
 class Log:
     """ Manage log output """
@@ -15,7 +14,7 @@ Parameters:
     environ: enviroment dictionary
 
 """
-        docroot = environ['DOCUMENT_ROOT'];
+        docroot = environ['DOCUMENT_ROOT']
         docroot = docroot if docroot else './'
 
         if log_date is None:
@@ -24,7 +23,7 @@ Parameters:
         else:
             try:
                 dt = datetime.datetime.strptime(log_date, "%Y-%m-%d") 
-            except:
+            except Exception:
                 pass
         result = None
         if log_date:
@@ -74,7 +73,7 @@ copy log into stream
                         chunk = chunk[:read_size]
                     strm.write(chunk)
                     total_size += read_size
-        except:
+        except Exception:
             pass
         return total_size
 

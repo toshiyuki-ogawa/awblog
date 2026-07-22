@@ -8,13 +8,16 @@ import json
 import log
 import multipart
 import os
-import sys
 import tomllib
 import traceback
 import urllib.parse
 import gettext
 
+from pathlib import Path
+
 from .accessctrl import AccessCtrl
+
+__all__ = ['App']
 
 class App:
     """ aw light weight blog system """
@@ -64,7 +67,7 @@ class App:
     @property
     def dtrack_app(self):
         """ data tracking application """
-        if not "_dtrack_app" in self.__dict__:
+        if "_dtrack_app" not in self.__dict__:
             dtrack_app = dtrack.App()
             dtrack_app.load_from_env()
             self._dtrack_app = dtrack_app
@@ -73,7 +76,7 @@ class App:
     @property
     def access_ctrl(self):
         """ access control object """
-        if not "_access_ctrl" in self.__dict__:
+        if "_access_ctrl" not in self.__dict__:
             access_ctrl = AccessCtrl()
             access_ctrl.load_setting()
             self._access_ctrl = access_ctrl
@@ -82,14 +85,14 @@ class App:
     @property
     def access_lock_file(self):
         """ file path to prevent from multiple access"""
-        if not "_access_lock_file" in self.__dict__:
+        if "_access_lock_file" not in self.__dict__:
             self.load_config_from_env()
         return self._access_lock_file
 
     @property
     def gettext_domain_dir(self):
         """ gettext domain directory """
-        if not "_gettext_domain_dir" in self.__dict__:
+        if "_gettext_domain_dir" not in self.__dict__:
             self.load_config_from_env()
         return self._gettext_domain_dir
 
@@ -120,7 +123,7 @@ class App:
         return result
     def get_request_content_type(self, params: dict):
         """ get content type """ 
-        return 'release' if not 'edit' in params else 'edit'
+        return 'release' if 'edit' not in params else 'edit'
 
     def get_author_and_email(self, environ, params: dict):
         """ get author and email """
@@ -136,12 +139,12 @@ class App:
                 email_info = email_validator.validate_email(
                         email_addr, check_deliverability = False)
                 email_addr = email_info.normalized
-            except:
+            except Exception as ex:
                 error_msg = f"'{email_addr}' is not acceped as email address" 
                 email_addr = None
                 log.Log.print_log_warn_into_stream(
                     environ['wsgi.errors'],
-                    repr(sys.exception()))
+                    repr(ex))
                 log.Log.print_log_warn_into_stream(
                     environ['wsgi.errors'],
                     traceback.format_exc())
@@ -192,32 +195,44 @@ class App:
     def create_content(self, environ, start_response, params: dict):
         """ create content """
         result = []
+        log.Log.print_log_info_into_stream(
+            environ['wsgi.errors'],
+            'start create content')
         if self.access_ctrl.allow_access(environ, params):
             res = {}
-            content_id = self.dtrack_app.create_content_for_editing()
-            if content_id:
-                write = self.set_response(
-                        start_response,
-                        http.HTTPStatus.OK,
-                        http.HTTPStatus.OK.phrase,
-                        [("content-type", "application/json")])
+            try:
+                content_id = self.dtrack_app.create_content_for_editing()
+                if content_id:
+                    write = self.set_response(
+                            start_response,
+                            http.HTTPStatus.OK,
+                            http.HTTPStatus.OK.phrase,
+                            [("content-type", "application/json")])
 
-                res = {
-                    'content-id': content_id,
-                    'status': 'OK'
-                }
-            else:
-                write = self.set_response(
-                        start_responnse,
-                        http.HTTPStatus.ACCEPTED,
-                        http.HTTPStatus.ACCEPTED.phrase,
-                        [("content-type", "application/json")])
-                res = {
-                    'status': 'NG',
-                    'message': gettext.dgettext(
-                        'awblog','Cannot create content')
-                }
-            write(json.dumps(res).encode())
+                    res = {
+                        'content-id': content_id,
+                        'status': 'OK'
+                    }
+                else:
+                    write = self.set_response(
+                            start_response,
+                            http.HTTPStatus.ACCEPTED,
+                            http.HTTPStatus.ACCEPTED.phrase,
+                            [("content-type", "application/json")])
+                    res = {
+                        'status': 'NG',
+                        'message': gettext.dgettext(
+                            'awblog','Cannot create content')
+                    }
+                write(json.dumps(res).encode())
+            except Exception as ex:
+                log.Log.print_log_warn_into_stream(
+                    environ['wsgi.errors'],
+                    repr(ex))
+                log.Log.print_log_warn_into_stream(
+                    environ['wsgi.errors'],
+                    traceback.format_exc())
+ 
         else:
             self.response_access_denied(start_response, 
                     gettext.dgettext(
@@ -259,10 +274,10 @@ class App:
                     self.response_access_denied(
                             start_response,
                             gettext.dgettext('awblog', 'No content ID'))
-            except:
+            except Exception as ex:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -276,7 +291,7 @@ class App:
                     gettext.dgettext(
                         'awblog', 'Editing content is not allowed'))
              
-        return []
+        return result
         
     def update_content(self, environ, start_response, params: dict):
         """ update content """
@@ -389,7 +404,6 @@ class App:
     def update_header(self, environ, start_response, params: dict):
         """ update header """
         if self.access_ctrl.allow_access(environ, params):
-            result = []
             content_id = self.get_content_id(params)
             if content_id is not None:
                 content_type = None
@@ -419,7 +433,7 @@ class App:
                             'status': 'OK'
                         }
                         writer(json.dumps(res).encode()) 
-                    except:
+                    except Exception as ex:
                         writer = self.set_response(
                                 start_response,
                                 http.HTTPStatus.NO_CONTENT,
@@ -427,7 +441,7 @@ class App:
                                 [])
                         log.Log.print_log_warn_into_stream(
                             environ['wsgi.errors'],
-                            repr(sys.exception()))
+                            repr(ex))
                         log.Log.print_log_warn_into_stream(
                                 environ['wsgi.errors'],
                                 traceback.format_exc())
@@ -487,7 +501,7 @@ class App:
                     self.response_access_denied(
                             start_response,
                             gettext.dgettext('awblog', 'No content ID')) 
-            except:
+            except Exception as ex:
                 self.set_response(
                         start_response,
                         http.HTTPStatus.NO_CONTENT,
@@ -495,7 +509,7 @@ class App:
                         [])
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -528,7 +542,7 @@ class App:
                             gettext.dgettext(
                                 'awblog',
                                 'No content ID'))
-            except:
+            except Exception as ex:
                 self.set_response(
                         start_response,
                         http.HTTPStatus.NO_CONTENT,
@@ -536,7 +550,7 @@ class App:
                         [])
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -552,7 +566,6 @@ class App:
                             environ, params)
                     if author and email_addr:
                         delete_editing = 'delete' in params
-                        content_header = None
                         with open(self.access_lock_file, "r+") as fp:
                             flock.acquire_lock(fp)
                             self.dtrack_app.commit(
@@ -604,7 +617,7 @@ class App:
                         start_response,
                         gettext.dgettext(
                             "awblog", "No content ID"))
-            except:
+            except Exception as ex:
                 self.set_response(
                         start_response,
                         http.HTTPStatus.BAD_REQUEST,
@@ -612,7 +625,7 @@ class App:
                         [])
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -645,11 +658,11 @@ class App:
                     self.response_access_denied(
                         start_response,
                         gettext.dgettext("awblog", "No content ID"))
-            except:
+            except Exception as ex:
 
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -683,10 +696,10 @@ class App:
                     "items": items
                 }
                 writer(json.dumps(res).encode())
-            except:
+            except Exception as ex:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -721,10 +734,10 @@ class App:
                     self.response_access_denied(
                         start_response,
                         gettext.dgettext("awblog", "No content ID"))
-            except:
+            except Exception as ex:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -751,10 +764,10 @@ class App:
                     'status': 'OK'
                 }
                 write(json.dumps(res).encode())
-            except:
+            except Exception as ex:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -784,10 +797,10 @@ class App:
                     'status': 'OK'
                 }
                 write(json.dumps(res).encode())
-            except:
+            except Exception as ex:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())
@@ -830,10 +843,10 @@ class App:
                         http.HTTPStatus.ACCEPTED.phrase,
                         [("content-type", "application/json")])
                 write(json.dumps(res).encode())
-            except:
+            except Exception as ex:
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
-                        repr(sys.exception()))
+                        repr(ex))
                 log.Log.print_log_warn_into_stream(
                         environ['wsgi.errors'],
                         traceback.format_exc())

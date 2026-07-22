@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#!/usr/bin/env python3
 
 import http
 import os
@@ -19,7 +19,8 @@ class Service:
         self.handler = {
             'init': self.sys_init,
             'write-log': self.sys_write_log,
-            'read-log': self.sys_read_log
+            'read-log': self.sys_read_log,
+            'echo': self.sys_echo
         }
 
 
@@ -137,7 +138,13 @@ class Service:
                 config_str = \
 f"""tracking-dir = "{docroot}/contents/repository"
 release-template-path = "{docroot}/contents/{{id}}"
+release-dir = "{docroot}/contents"
+release-match = "(\\\\d+)$"
+release-id-group-index = 1
 edit-template-path = "{docroot}/contents/{{id}}-editing"
+edit-dir = "{docroot}/contents"
+edit-match = "(\\\\d+)-editing$"
+edit-id-group-index = 1
 id-management-path = "{docroot}/contents/idx.txt"
 stream-chunk-size = {stream_chunk_size}
 """
@@ -158,7 +165,7 @@ stream-chunk-size = {stream_chunk_size}
 f"""editor-list-path = "{docroot}/local/conf/editor-list.txt"
 google-client-id-path = "{docroot}/google-client-id.txt"
 """
-                with open(config, "wf") as fp:
+                with open(config, "w") as fp:
                     fp.write(config_str)
             result = True                 
         return result
@@ -234,7 +241,7 @@ gettext-domain-dir = "{docroot}/local"
         self.write_status_line(
             http.HTTPStatus.OK,
             http.HTTPStatus.OK.phrase)
-        sys.stdout.write("Content-Type: plain/text\n")
+        sys.stdout.write("Content-Type: text/plain\n")
         sys.stdout.write('\n')
         sys.stdout.flush()
         buf = sys.stdout.buffer
@@ -244,6 +251,22 @@ gettext-domain-dir = "{docroot}/local"
                 log.Log.copy_log_to_stream(log_path, buf)
                 
         sys.stdout.flush() 
+
+    def sys_echo(self, params: dict):
+
+        msg = ''
+        if 'message' in params:
+            msg = params['message']  
+
+        self.write_status_line(
+            http.HTTPStatus.OK,
+            http.HTTPStatus.OK.phrase)
+        sys.stdout.write("Content-Type: text/plain\n")
+        sys.stdout.write('\n')
+        sys.stdout.flush()
+        sys.stdout.write(msg) 
+        sys.stdout.flush() 
+
 
     def get_secret_path(self):
         """ get the path which contains secret text """
