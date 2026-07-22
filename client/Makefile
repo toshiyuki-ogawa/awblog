@@ -34,6 +34,11 @@ ui-index-entries-json:
 
 .PHONY: ui-index-entries-json
 
+ui-index-entries-map-txt:
+	$(MAKE) -C ui index-entries-map-txt
+
+.PHONY: ui-index-entries-map-txt
+
 
 ui-awblog-pot: 
 	$(MAKE) -C ui awblog-pot

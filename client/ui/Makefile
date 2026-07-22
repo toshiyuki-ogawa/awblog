@@ -11,9 +11,17 @@ lint:
 .PHONY: lint
 
 index-entries-json: 
-	npm run make-index-map >index-entries.json
+	npm run make-index-map
 
 .PHONY: index-entries-json
+
+
+index-entries-map-txt: 
+	npm run make-index-map-txt
+
+.PHONY: index-entries-txt
+
+
 
 
 i18n-src/awblog.pot:

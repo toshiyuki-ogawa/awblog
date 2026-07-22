@@ -77,6 +77,7 @@ function showHelp() {
 -h,--help               Show this message.
 -f,--file=[FILE]        Specify the key file to be scanned to list file names.
 -e,--ext=[EXT]          Specify the matched extension. default html
+-m,--format=[json|txt]  Specify output format. defualt json
 `)
 }
 
@@ -87,7 +88,8 @@ function showHelp() {
 function parseOption() {
 
   const result = {
-    ext: 'html'
+    ext: 'html',
+    format: 'json'
   }
 
   for (let idx = 2; idx < process.argv.length; idx++) {
@@ -105,6 +107,12 @@ function parseOption() {
       }
     } else if (/--ext=(.+)/.test(arg)) {
       result.ext = RegExp.$1
+    } else if (/(-m|--format)$/.test(arg)) {
+      if (idx < process.argv.length  - 1) {
+        result.format = process.argv[++idx]
+      }
+    } else if (/--format=(.+)/.test(arg)) {
+      result.format = RegExp.$1
     } else if (/(-h|--help)$/.test(arg)) {
       result.showHelp = true
     }
@@ -120,15 +128,26 @@ async function mainProc(option) {
   if (option.file) {
     const keyEntries = await loadKeyEntries(option.file, option.ext) 
 
-    const keyFiles = { }
-    for (let key in keyEntries) {
-      const [file, ext] = keyEntries[key]
-      const files = await listFiles(file, ext) 
-      keyFiles[key] = files
+
+    if (option.format == 'json') {
+      const keyFiles = { }
+      for (let key in keyEntries) {
+        const [file, ext] = keyEntries[key]
+        const files = await listFiles(file, ext) 
+        keyFiles[key] = files
+      }
+      process.stdout.write(JSON.stringify(keyFiles, null, 2))
+    } else if (option.format == 'txt') {
+      const lines = []  
+      for (let key in keyEntries) {
+        const [file, ext] = keyEntries[key]
+        const files = await listFiles(file, ext) 
+        for (const f of files) {
+          lines.push(`${f} ${key}`)
+        }
+      }
+      process.stdout.write(lines.join("\n"))
     }
-
-    process.stdout.write(JSON.stringify(keyFiles, null, 2))
-
   } else if (option.showHelp) {
     showHelp()
   }

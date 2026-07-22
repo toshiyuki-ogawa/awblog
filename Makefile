@@ -6,6 +6,7 @@ deploy: deploy-local-python \
 	deploy-awbconfig \
 	deploy-entry-title-json \
 	deploy-index-entries-json \
+	deploy-index-entries-map-txt \
 	deploy-content-types
 
 .PHONY: deploy
@@ -73,6 +74,16 @@ deploy-index-entries-json: docroot/index-entries.json
 
 .PHONY: deploy-index-entries-json
 
+docroot/index-entries-map.txt: client/ui/index-entries-map.txt
+	cp $< $@
+
+deploy-index-entries-map-txt: docroot/index-entries-map.txt
+
+.PHONY: deploy-index-entries-map-txt
+
+
+
+
 docroot/content-types.json: client/ui/content-types.json
 	cp $< $@
 
@@ -94,20 +105,30 @@ deploy-local-python: local-python
 .PHONY: deploy-local-python
 
 deploy-cgi: | htbin-dir
-	rm docroot/htbin/*.py
+	rm -f docroot/htbin/*.py
 	cp server/src/cgi/*.py docroot/htbin
 	chmod +x docroot/htbin/*
 
 .PHONY: deploy-cgi
 
 
-deploy-cgi-entry: docroot/awblog-index.cgi
+deploy-cgi-entry: docroot/awblog-index.cgi docroot/awblog-sys.cgi docroot/awblog-res-ctrl.cgi
 
 .PHONY: deploy-cgi-entry
 
-docroot/awblog-index.cgi: docroot/htbin/htlog.py 
+docroot/awblog-index.cgi: server/src/cgi/htlog.py 
 	cp $< $@
 	chmod +x $@
+
+docroot/awblog-sys.cgi: server/src/cgi/htlog-sys.py
+	cp $< $@
+	chmod +x $@
+
+docroot/awblog-res-ctrl.cgi: server/src/cgi/htlog-res-ctrl.py
+	cp $< $@
+	chmod +x $@
+
+
 
 clean-pycache:
 	find docroot/local/python -name '*.pyc' -o -name '__pycache__' -delete
@@ -188,6 +209,15 @@ client-ui-index-entries-json:
 	$(MAKE) -C client ui-index-entries-json
 
 .PHONY: client-ui-index-entries-json
+
+
+client/ui/index-entries-map.txt: client-ui-index-entries-map-txt
+
+client-ui-index-entries-map-txt:
+	$(MAKE) -C client ui-index-entries-map-txt
+
+.PHONY: client-ui-index-entries-map-txt
+
 
 
 server-awblog-pot:

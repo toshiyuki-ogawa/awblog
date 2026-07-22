@@ -19,6 +19,7 @@
     "tsc-check": "tsc --noEmit",
     "html-dist": "parcel build --target=html --no-optimize",
     "make-index-map": "node tools/list-link.mjs -f index-entries.txt -e html >index-entries.json",
+    "make-index-map-txt": "node tools/list-link.mjs -f index-entries.txt -m txt -e html >index-entries-map.txt",
     "gen-i18n": "node tools/i18n-gen.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
