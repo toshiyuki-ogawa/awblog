@@ -86,15 +86,34 @@ async function commitContent(
   const author = getAuthor()
   const token = getOauthToken()
   let result = false
-  if (author
-      && token
-      && author.name
-      && author.email) {
+  let message = ''
+
+  let doCommit = true
+  if (!author) {
+    doCommit = false
+    message = getDomainText(
+      'awblog',
+      'Commit requires both an author and an email') 
+  }
+
+  if (doCommit) {
+    if (!author!!.name) {
+      doCommit = false
+      message = getDomainText('awblog', 'Commit requires an author') 
+    }
+  }
+  if (doCommit) {
+    if (!author!!.email) {
+      doCommit = false
+      message = getDomainText('awblog', 'Commit orequires an email') 
+    }
+  }
+
+  if (doCommit) {
     const resp = await commit(
       contentId,
-      author.name!!, author.email!!, deleteEditing, token)
+      author!!.name!!, author!!.email!!, deleteEditing, token ?? undefined)
     let succeeded = false
-    let message = ''
     if (resp) {
       const respJson = await resp.json()
       if ('status' in respJson) {
@@ -110,11 +129,15 @@ async function commitContent(
       if (messageMng) {
         if (message) {
           message = getDomainText('awblog', message)
-          messageMng.setMessage(`${message}`)
+          messageMng.setMessage(message)
         } else {
           messageMng.setMessage('')
         }
       }
+    }
+  } else if (message) {
+    if (messageMng) {
+      messageMng.setMessage(message)
     }
   }
   return result

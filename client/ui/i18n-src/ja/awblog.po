@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the awblog-msg package.
 # Toshiyuki Ogawa<toshiyuki.ogawa.2.71@gmail.com>, redo
 #
-#: src/ContentTypeEdit.tsx:114 src/TextEdit.tsx:574 src/BinaryEdit.tsx:95
+#: src/ContentTypeEdit.tsx:114 src/TextEdit.tsx:593 src/BinaryEdit.tsx:95
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: awblog-msg 0.0.2\n"
+"Project-Id-Version: awblog-msg 0.0.3\n"
 "Report-Msgid-Bugs-To: toshiyuki.ogawa.2.71@gmail.com\n"
-"POT-Creation-Date: 2026-07-18 16:09+0900\n"
-"PO-Revision-Date: 2026-07-12 17:48+0900\n"
+"POT-Creation-Date: 2026-07-25 07:09+0900\n"
+"PO-Revision-Date: 2026-07-24 22:03+0900\n"
 "Last-Translator: Toshiyuki Ogawa <toshiyuki.ogawa.2.71@gmail.com>\n"
 "Language-Team: ja <toshiyuki.ogawa.2.71@gmail.com>\n"
 "Language: \n"
@@ -24,7 +24,7 @@ msgstr "テーマ"
 
 #: src/EditorThemeSelector.tsx:118 src/ContentEditToolbar.tsx:67
 #: src/EditorModeSelector.tsx:118 src/ContentTypeEdit.tsx:148
-#: src/TextEdit.tsx:294
+#: src/TextEdit.tsx:313
 msgid "Save"
 msgstr "保存"
 
@@ -53,28 +53,40 @@ msgstr "適用"
 msgid "Create"
 msgstr "作成"
 
-#: src/ContentEdit.tsx:255
+#: src/ContentEdit.tsx:96
+msgid "Commit requires both an author and an email"
+msgstr "コミットには、著者とemailが必要です。"
+
+#: src/ContentEdit.tsx:102
+msgid "Commit requires an author"
+msgstr "コミットには著者が必要です。"
+
+#: src/ContentEdit.tsx:108
+msgid "Commit orequires an email"
+msgstr "コミットには、emailが必要です。"
+
+#: src/ContentEdit.tsx:284
 #, javascript-format
 msgid "Content type: %s"
 msgstr "コンテントタイプ: %s"
 
-#: src/ContentEdit.tsx:275
+#: src/ContentEdit.tsx:304
 msgid "Save and commit settings"
 msgstr "保存とコミット"
 
-#: src/ContentEdit.tsx:278 src/ContentEditToolbar.tsx:72
+#: src/ContentEdit.tsx:307 src/ContentEditToolbar.tsx:72
 msgid "Commit"
 msgstr "コミット"
 
-#: src/ContentEdit.tsx:288
+#: src/ContentEdit.tsx:317
 msgid "Select the page to navigate to after deleting the page being edited."
 msgstr "編集ページ削除したときに移動するページを選択してください。"
 
-#: src/ContentEdit.tsx:298 src/AccountLine.tsx:90
+#: src/ContentEdit.tsx:327 src/AccountLine.tsx:90
 msgid "Account"
 msgstr "アカウント"
 
-#: src/ContentEdit.tsx:303 src/AuthorLine.tsx:87 src/EditAuthorLine.tsx:94
+#: src/ContentEdit.tsx:332 src/AuthorLine.tsx:87 src/EditAuthorLine.tsx:94
 #: src/EditAuthorPage.tsx:57 src/EditAuthor.tsx:95 src/EditAuthor.tsx:171
 msgid "Author"
 msgstr "著者"
@@ -99,7 +111,7 @@ msgstr "プレビュー幅"
 msgid "Preview height"
 msgstr "プレビュー高さ"
 
-#: src/BlobPreview.tsx:141 src/TextEdit.tsx:182 src/Contents.tsx:87
+#: src/BlobPreview.tsx:141 src/TextEdit.tsx:201 src/Contents.tsx:87
 #: src/EditAuthorPage.tsx:76 src/EditAuthor.tsx:81 src/EditAuthor.tsx:186
 msgid "Update"
 msgstr "更新"
@@ -133,27 +145,27 @@ msgstr "トークン期限"
 msgid "Reload token"
 msgstr "トークン再読み込み"
 
-#: src/TextEdit.tsx:169
+#: src/TextEdit.tsx:188
 msgid "Text source"
 msgstr "テキストデータ"
 
-#: src/TextEdit.tsx:282
+#: src/TextEdit.tsx:301
 msgid "Download file name"
 msgstr "ダウンロードファイル名"
 
-#: src/TextEdit.tsx:310
+#: src/TextEdit.tsx:329
 msgid "Download"
 msgstr "ダウンロード"
 
-#: src/TextEdit.tsx:357
+#: src/TextEdit.tsx:376
 msgid "Download..."
 msgstr "ダウンロード..."
 
-#: src/TextEdit.tsx:602
+#: src/TextEdit.tsx:621
 msgid "Editor setting"
 msgstr "エディタ設定"
 
-#: src/TextEdit.tsx:624
+#: src/TextEdit.tsx:643
 msgid "Upload and download"
 msgstr "アップロード・ダウンロード"
 
