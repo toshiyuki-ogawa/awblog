@@ -69,7 +69,7 @@ class AccessCtrl:
                         os.environ,
                         "Not set editor-list-path")
                 google_client_id_path = config['google-client-id-path']
-                if editor_list_path:
+                if google_client_id_path:
                     self._google_client_id = \
                         self.load_google_client_id(google_client_id_path)
                 else:
@@ -111,12 +111,23 @@ class AccessCtrl:
   
         return result
      
+    def get_value_from_environ_ignore_case(self, environ: dict, key: str):
+        """ get value from environ """
+        result = None
+        test_keys = [ key ]
+        if not key.startswith('HTTP_'):
+            test_keys.append(f"HTTP_{key}")
+
+        for test_key in test_keys:
+            if test_key in environ:
+                result = environ[test_key]
+        return result
+
     def read_email_from_bearer(self, environ: dict):
         """ read email from bearer """
         result = None
-        authorization = environ['AUTHORIZATION'] \
-            if 'AUTHORIZATION' in environ else None
-
+        authorization = self.get_value_from_environ_ignore_case(
+            environ, 'AUTHORIZATION')
         token = None
         if authorization:
             type_value = authorization.split()
