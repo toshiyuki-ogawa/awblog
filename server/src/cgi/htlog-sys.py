@@ -102,6 +102,8 @@ class Service:
         if state:
             state = self.create_weglog_access_ctrl_config()
         if state:
+            state = self.create_initial_id_txt()
+        if state:
             self.write_status_line(
                 http.HTTPStatus.OK,
                 http.HTTPStatus.OK.phrase)
@@ -192,6 +194,17 @@ gettext-domain-dir = "{docroot}/local"
                 with open(config, "w") as fp:
                     fp.write(config_str)
             result = True
+        return result
+    def create_initial_id_txt(self):
+        """ create initial id text file."""
+        docroot = os.getenv("DOCUMENT_ROOT")
+        result = False
+        if docroot:
+            initial_id_txt_file = pathlib.Path(docroot) / "initial-id.txt"
+            if not initial_id_txt_file.is_file():
+                with open(initial_id_txt_file, "w") as fp:
+                    fp.write("1\n")
+            result = True 
         return result
     def sys_write_log(self, params: dict):
         """ log output """
