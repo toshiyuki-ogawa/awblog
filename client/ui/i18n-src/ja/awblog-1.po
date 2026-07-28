@@ -1,0 +1,30 @@
+# entry title message template.
+# Copyright (C) 2026 Toshiyuki Ogawa
+# This file is distributed under the same license as the awblog-msg package.
+# Toshiyuki Ogawa <toshiyuki.ogawa.2.71@gmail.com>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: awblog-msg 0.0.1\n"
+"Report-Msgid-Bugs-To: toshiyuki.ogawa.2.71@gmail.com\n"
+"POT-Creation-Date: 2026-07-25 07:09+0900\n"
+"PO-Revision-Date: 2026-07-28 HO:MI+ZONE\n"
+"Last-Translator: Toshiyuki Ogawa <Toshiyuki.Ogawa@gmail.com>\n"
+"Language-Team: ja <Toshiyuki.Ogawa@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Index"
+msgstr "インデックス"
+
+msgid "Contents management"
+msgstr "コンテンツマネージ"
+
+msgid "Web log"
+msgstr "ブログ"
+
+msgid "Page management"
+msgstr "ページ管理"

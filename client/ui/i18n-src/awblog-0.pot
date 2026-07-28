@@ -1,0 +1,239 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Toshiyuki Ogawa
+# This file is distributed under the same license as the awblog-msg package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#: src/ContentTypeEdit.tsx:114 src/TextEdit.tsx:593 src/BinaryEdit.tsx:95
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: awblog-msg 0.0.1\n"
+"Report-Msgid-Bugs-To: toshiyuki.ogawa.2.71@gmail.com\n"
+"POT-Creation-Date: 2026-07-25 07:09+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/EditorThemeSelector.tsx:98
+msgid "Theme"
+msgstr ""
+
+#: src/EditorThemeSelector.tsx:118 src/ContentEditToolbar.tsx:67
+#: src/EditorModeSelector.tsx:118 src/ContentTypeEdit.tsx:148
+#: src/TextEdit.tsx:313
+msgid "Save"
+msgstr ""
+
+#: src/EditorThemeSelector.tsx:123 src/EditorTabSetting.tsx:166
+#: src/EditorModeSelector.tsx:123
+msgid "Update with storage contents"
+msgstr ""
+
+#: src/EditorTabSetting.tsx:131
+msgid "Tab size"
+msgstr ""
+
+#: src/EditorTabSetting.tsx:145
+msgid "Soft tab"
+msgstr ""
+
+#: src/EditorTabSetting.tsx:156
+msgid "enable"
+msgstr ""
+
+#: src/EditorTabSetting.tsx:163
+msgid "Apply"
+msgstr ""
+
+#: src/StartNewContent.tsx:110
+msgid "Create"
+msgstr ""
+
+#: src/ContentEdit.tsx:96
+msgid "Commit requires both an author and an email"
+msgstr ""
+
+#: src/ContentEdit.tsx:102
+msgid "Commit requires an author"
+msgstr ""
+
+#: src/ContentEdit.tsx:108
+msgid "Commit orequires an email"
+msgstr ""
+
+#: src/ContentEdit.tsx:284
+#, javascript-format
+msgid "Content type: %s"
+msgstr ""
+
+#: src/ContentEdit.tsx:304
+msgid "Save and commit settings"
+msgstr ""
+
+#: src/ContentEdit.tsx:307 src/ContentEditToolbar.tsx:72
+msgid "Commit"
+msgstr ""
+
+#: src/ContentEdit.tsx:317
+msgid "Select the page to navigate to after deleting the page being edited."
+msgstr ""
+
+#: src/ContentEdit.tsx:327 src/AccountLine.tsx:90
+msgid "Account"
+msgstr ""
+
+#: src/ContentEdit.tsx:332 src/AuthorLine.tsx:87 src/EditAuthorLine.tsx:94
+#: src/EditAuthorPage.tsx:57 src/EditAuthor.tsx:95 src/EditAuthor.tsx:171
+msgid "Author"
+msgstr ""
+
+#: src/EditorModeSelector.tsx:98
+msgid "Mode"
+msgstr ""
+
+#: src/ContentTypeEdit.tsx:132
+msgid "Content type"
+msgstr ""
+
+#: src/ContentTypeEdit.tsx:153
+msgid "Load"
+msgstr ""
+
+#: src/BlobPreview.tsx:113
+msgid "Preview width"
+msgstr ""
+
+#: src/BlobPreview.tsx:126
+msgid "Preview height"
+msgstr ""
+
+#: src/BlobPreview.tsx:141 src/TextEdit.tsx:201 src/Contents.tsx:87
+#: src/EditAuthorPage.tsx:76 src/EditAuthor.tsx:81 src/EditAuthor.tsx:186
+msgid "Update"
+msgstr ""
+
+#: src/AccountMng.tsx:51
+msgid "Verified"
+msgstr ""
+
+#: src/AccountMng.tsx:53
+msgid "Not verified:"
+msgstr ""
+
+#: src/AccountMng.tsx:57
+msgid "Name"
+msgstr ""
+
+#: src/AccountMng.tsx:59 src/EditAuthorPage.tsx:65 src/EditAuthor.tsx:105
+#: src/EditAuthor.tsx:178
+msgid "Email"
+msgstr ""
+
+#: src/AccountMng.tsx:61
+msgid "Email verified"
+msgstr ""
+
+#: src/AccountMng.tsx:63
+msgid "Token expiration"
+msgstr ""
+
+#: src/AccountMng.tsx:102
+msgid "Reload token"
+msgstr ""
+
+#: src/TextEdit.tsx:188
+msgid "Text source"
+msgstr ""
+
+#: src/TextEdit.tsx:301
+msgid "Download file name"
+msgstr ""
+
+#: src/TextEdit.tsx:329
+msgid "Download"
+msgstr ""
+
+#: src/TextEdit.tsx:376
+msgid "Download..."
+msgstr ""
+
+#: src/TextEdit.tsx:621
+msgid "Editor setting"
+msgstr ""
+
+#: src/TextEdit.tsx:643
+msgid "Upload and download"
+msgstr ""
+
+#: src/CommitOption.tsx:24
+msgid "Delete editing content on commit"
+msgstr ""
+
+#: src/Contents.tsx:50
+msgid "Line Number"
+msgstr ""
+
+#: src/Contents.tsx:69
+msgid "Count per page"
+msgstr ""
+
+#: src/StartEditContent.tsx:107 src/ContentList.tsx:168 src/ContentList.tsx:180
+#: src/ContentList.tsx:191
+msgid "Edit"
+msgstr ""
+
+#: src/NewContent.tsx:34
+msgid "New Content"
+msgstr ""
+
+#: src/EditAuthorPage.tsx:79
+msgid "Cancel"
+msgstr ""
+
+#: src/CommitOptionLine.tsx:91
+msgid "Commit option"
+msgstr ""
+
+#: src/ContentList.tsx:216
+msgid "id"
+msgstr ""
+
+#: src/ContentList.tsx:218
+msgid "oid"
+msgstr ""
+
+#: src/ContentList.tsx:220 src/ContentList.tsx:224
+msgid "release"
+msgstr ""
+
+#: src/ContentList.tsx:226
+msgid "editing status"
+msgstr ""
+
+#: src/ContentList.tsx:229
+msgid "editing"
+msgstr ""
+
+#: src/EditAuthor.tsx:86 src/EditAuthor.tsx:191
+msgid "Copy from account"
+msgstr ""
+
+#: src/BinaryEdit.tsx:281
+msgid "Image source"
+msgstr ""
+
+#: src/BinaryEdit.tsx:297
+msgid "Update with file"
+msgstr ""
+
+#: src/BinaryEdit.tsx:300
+msgid "Clear"
+msgstr ""
+
+#: src/BinaryEdit.tsx:303
+msgid "Reload"
+msgstr ""

@@ -197,7 +197,7 @@ async function mainProc(options) {
 
 (async ()=>{
 
-  const sourceDirs = ['i18n-src']
+  const sourceDirs = ['i18n-build']
   if (process.env.SOURCE_DIRS) {
     sourceDirs.push(...process.env.SOURCE_DIRS.split(path.delimiter))
   }

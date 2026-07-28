@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react'
+import { getDomainText } from './i18n'
 
 /**
  * link item
@@ -70,7 +71,11 @@ export default function LinkSelect(props: LinkSelectProperties) {
             return (
               <option
                 value={item.link}
-                label={item.title ? item.title : item.link} />
+                label={
+                  item.title
+                    ? getDomainText('awblog', item.title) : item.link
+                }
+              />
             )
           })
         }

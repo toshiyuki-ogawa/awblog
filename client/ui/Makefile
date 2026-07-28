@@ -23,21 +23,24 @@ index-entries-map-txt:
 
 
 
-
-i18n-src/awblog.pot:
+i18n-src/awblog-0.pot:
 	sh tools/i18n-tool.sh >$@
 
-.PHONY: i18n-src/awblog.pot
+awblog-0-pot: i18n-src/awblog-0.pot
 
-awblog-pot: i18n-src/awblog.pot
-
-.PHONY: awblog-pot
+.PHONY: awblog-0-pot
 
 
-awblog-msg-json:
+
+i18n-build/ja/awblog.po : $(wildcard i18n-src/ja/awblog-*.po)
+	mkdir  -p $(@D)
+	msgcat -o $@ $^
+
+
+awblog-msg-json: i18n-build/ja/awblog.po 
 	npm run gen-i18n
 
-
 .PHONY: awblog-msg-json
+
 
 # vi: se ts=4 sw=4 noet:

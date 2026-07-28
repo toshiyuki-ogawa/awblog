@@ -209,6 +209,19 @@ function createContents(
 
   const result = items.slice(
     pageIndex, pageIndex + countPerPage).map((item) => {
+    let releaseStatusStr = ''
+    if (item.release) {
+      releaseStatusStr = getDomainText('awblog', 'release')
+    } else {
+      releaseStatusStr = getDomainText('awblog', 'not release')
+    }
+    let editingStatusStr = ''
+    if (item.editing) {
+      editingStatusStr = getDomainText('awblog', 'editing')
+    } else {
+      editingStatusStr = getDomainText('awblog', 'not editing')
+    }
+
     return (
       <>
         <li>
@@ -218,16 +231,9 @@ function createContents(
             <dt>{getDomainText('awblog', 'oid')}</dt>
             <dd>{item.oid}</dd>
             <dt>{getDomainText('awblog', 'release')}</dt>
-            <dd>{
-              getDomainText(
-                'awblog',
-                item.release ? 'release' : 'not release')
-            }</dd>
+            <dd>{releaseStatusStr}</dd>
             <dt>{getDomainText('awblog', 'editing status')}</dt>
-            <dd>{
-              getDomainText(
-                'awblog', item.editing ? 'editing' : 'not editing')
-            }</dd>
+            <dd>{editingStatusStr}</dd>
           </dl>
           <div>
             <ItemOpration item={item}  />

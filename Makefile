@@ -7,6 +7,7 @@ deploy: deploy-local-python \
 	deploy-entry-title-json \
 	deploy-index-entries-json \
 	deploy-index-entries-map-txt \
+	deploy-htaccess \
 	deploy-content-types
 
 .PHONY: deploy
@@ -59,6 +60,13 @@ deploy-awbconfig-t: docroot/awbconfig-t.json
 
 .PHONY: deploy-awbconfig-t
 
+
+docroot/_htaccess : conf/_htaccess
+	cp $< $@
+
+deploy-htaccess : docroot/_htaccess
+
+.PHONY: deploy-htaccess
 
 deploy-entry-title-json: docroot/entry-title.json
 
