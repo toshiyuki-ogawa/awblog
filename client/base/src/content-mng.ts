@@ -160,10 +160,6 @@ export async function updateContentHeader(
     const searchParams = new URLSearchParams()
     searchParams.append('action', 'update-header')
     searchParams.append('content-id', contentId.toString())
-    if (accessToken) {
-      searchParams.append('access-token', accessToken)
-    }
-
     const body = JSON.stringify(contentHeader)
     const res = await fetch(`${requestPath}?${searchParams}`, {
       method: 'POST',
